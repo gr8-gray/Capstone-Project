@@ -17,7 +17,7 @@ It is developed using **Java**, **HTML**, **JavaScript**, and **MySQL**.
 - [Member 3] – Backend Developer  
 - [Member 4] – Database Engineer  
 - [Member 5] – Frontend Developer / Tester  
-- [Member 6] – Documentation & QA Lead  
+- James Strange – Documentation & QA Lead  
 
 ---
 
