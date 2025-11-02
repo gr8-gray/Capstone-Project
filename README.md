@@ -1,46 +1,3 @@
-<<<<<<< HEAD
-# 💰 Smart Expense Tracking Application
-
-### University of Maryland Global Campus  
-**CMSC 495 – Computer Science Capstone**
-
----
-
-## 📘 Overview
-The **Smart Expense Tracking Application** helps users record, categorize, and analyze their expenses through an intuitive, web-based interface.  
-It is developed using **Java**, **HTML**, **JavaScript**, and **MySQL**.
-
----
-
-## 👥 Team Members
-- Duane Mitchell – Project Manager / Frontend Developer  
-- [Member 2] – Frontend Lead  
-- [Member 3] – Backend Developer  
-- [Member 4] – Database Engineer  
-- [Member 5] – Frontend Developer / Tester  
-- James Strange – Documentation & QA Lead  
-
----
-
-## 🎯 Project Goals
-- Develop a secure expense tracking application accessible via a web browser  
-- Allow users to categorize transactions and view reports  
-- Deliver full documentation and a presentation demonstrating our technical implementation  
-
----
-
-## 🧰 Technologies
-- **Backend:** Java (JDK 17+), JDBC, MySQL  
-- **Frontend:** HTML, CSS, JavaScript  
-- **IDE:** IntelliJ IDEA, Visual Studio Code  
-- **Version Control:** GitHub  
-- **Project Management:** GitHub Projects  
-- **Communication:** Discord  
-
----
-
-## 🗂 Folder Structure
-=======
 # Smart Expense Tracking Application
 
 A web-based expense tracking application developed as a capstone project for CMSC 495 at the University of Maryland Global Campus. This application enables users to record, categorize, and analyze their daily financial transactions with secure authentication and intuitive data visualization.
@@ -68,6 +25,7 @@ A web-based expense tracking application developed as a capstone project for CMS
 The Smart Expense Tracking Application provides a comprehensive solution for personal financial management. Users can securely log in, enter expenses with detailed categorization, and view their spending patterns through visual analytics including charts and reports.
 
 ### Key Objectives
+
 - Provide a simple and secure interface for managing daily expenses
 - Enable users to track, categorize, and analyze spending trends
 - Support data visualization through charts and summaries
@@ -77,18 +35,19 @@ The Smart Expense Tracking Application provides a comprehensive solution for per
 
 **Group 3 - UMGC CMSC 495 Capstone Project**
 
-| Member | Role | Responsibilities |
-|--------|------|-----------------|
+| Member             | Role                                | Responsibilities                                                                    |
+| ------------------ | ----------------------------------- | ----------------------------------------------------------------------------------- |
 | **Duane Mitchell** | Project Manager / Backend Developer | Project oversight, milestone management, system integration, backend implementation |
-| **John Malone** | Frontend Lead | UI/UX design, responsive features, visual interface management |
-| **Eric Gray** | Backend Developer (Java) | Core Java modules, data handling, backend services integration |
-| **Michael Basye** | Database Engineer | MySQL schema design, query optimization, data reliability |
-| **Pukar Adhikari** | Frontend Developer / Tester | UI functionality testing, bug tracking |
-| **James Strange** | QA Lead / Documentation Specialist | Testing documentation, quality control, report compilation |
+| **John Malone**    | Frontend Lead                       | UI/UX design, responsive features, visual interface management                      |
+| **Eric Gray**      | Backend Developer (Java)            | Core Java modules, data handling, backend services integration                      |
+| **Michael Basye**  | Database Engineer                   | MySQL schema design, query optimization, data reliability                           |
+| **Pukar Adhikari** | Frontend Developer / Tester         | UI functionality testing, bug tracking                                              |
+| **James Strange**  | QA Lead / Documentation Specialist  | Testing documentation, quality control, report compilation                          |
 
 ## ✨ Features
 
 ### Current Features
+
 - **Secure Authentication System**: User login/logout with Spring Security
 - **Expense Management**: Add, edit, and delete expense entries
 - **Expense Categorization**: Organize expenses by type (food, transportation, utilities, etc.)
@@ -96,6 +55,7 @@ The Smart Expense Tracking Application provides a comprehensive solution for per
 - **Database Integration**: MySQL integration with JPA/Hibernate
 
 ### Planned Features
+
 - **Visual Analytics**: Charts and graphs for spending visualization
 - **Report Generation**: Exportable summary reports (CSV/PDF format)
 - **Administrative Dashboard**: User management capabilities
@@ -105,6 +65,7 @@ The Smart Expense Tracking Application provides a comprehensive solution for per
 ## 🛠 Technology Stack
 
 ### Backend
+
 - **Java 21** - Core programming language
 - **Spring Boot 4.0.0-RC1** - Application framework
 - **Spring Security** - Authentication and authorization
@@ -112,15 +73,18 @@ The Smart Expense Tracking Application provides a comprehensive solution for per
 - **Hibernate** - ORM framework
 
 ### Database
+
 - **MySQL** - Primary database
 - **MySQL Connector/J** - Database driver
 
 ### Frontend (Planned)
+
 - **HTML5** - Markup language
 - **CSS3** - Styling and responsive design
 - **JavaScript** - Client-side interactivity
 
 ### Development Tools
+
 - **Maven** - Build automation and dependency management
 - **Git/GitHub** - Version control and collaboration
 - **IntelliJ IDEA / VS Code** - Development environments
@@ -171,6 +135,7 @@ Before running this application, ensure you have the following installed:
 - **Git** (for version control)
 
 ### Recommended IDEs
+
 - IntelliJ IDEA (Community or Ultimate Edition)
 - Visual Studio Code with Java Extension Pack
 - Eclipse IDE for Java Developers
@@ -178,14 +143,17 @@ Before running this application, ensure you have the following installed:
 ## 🚀 Installation & Setup
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/your-team/smart-expense-tracker.git
 cd smart-expense-tracker/expense-api
 ```
 
 ### 2. Database Setup
+
 1. Install and start MySQL server
 2. Create a new database:
+
 ```sql
 CREATE DATABASE expense_db;
 CREATE USER 'expense_user'@'localhost' IDENTIFIED BY 'your_password';
@@ -194,7 +162,9 @@ FLUSH PRIVILEGES;
 ```
 
 ### 3. Configure Application Properties
+
 Update `src/main/resources/application.properties`:
+
 ```properties
 spring.application.name=expense-api
 
@@ -212,11 +182,13 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 ## ⚙️ Configuration
 
 ### Development Environment
+
 - The application uses `spring.jpa.hibernate.ddl-auto=update` for automatic schema updates
 - SQL queries are logged when `spring.jpa.show-sql=true`
 - Default server port is 8080
 
 ### Production Considerations
+
 - Change `ddl-auto` to `validate` or `none` in production
 - Configure proper logging levels
 - Set up environment-specific profiles
@@ -225,6 +197,7 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 ## 🏃‍♂️ Running the Application
 
 ### Using Maven Wrapper (Recommended)
+
 ```bash
 # On Windows
 ./mvnw.cmd spring-boot:run
@@ -234,11 +207,13 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 ```
 
 ### Using Maven Directly
+
 ```bash
 mvn spring-boot:run
 ```
 
 ### Using IDE
+
 1. Import the project as a Maven project
 2. Run `ExpenseApiApplication.java` as a Java application
 
@@ -247,30 +222,34 @@ The application will start on `http://localhost:8080`
 ## 🔌 API Endpoints
 
 ### Expense Management
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|---------|
-| `POST` | `/api/expenses` | Create a new expense | 🚧 In Development |
-| `GET` | `/api/expenses` | Get all expenses for user | 🚧 In Development |
-| `GET` | `/api/expenses/{id}` | Get expense by ID | 📝 Planned |
-| `PUT` | `/api/expenses/{id}` | Update expense | 🚧 In Development |
-| `DELETE` | `/api/expenses/{id}` | Delete expense | 📝 Planned |
+
+| Method   | Endpoint             | Description               | Status            |
+| -------- | -------------------- | ------------------------- | ----------------- |
+| `POST`   | `/api/expenses`      | Create a new expense      | 🚧 In Development |
+| `GET`    | `/api/expenses`      | Get all expenses for user | 🚧 In Development |
+| `GET`    | `/api/expenses/{id}` | Get expense by ID         | 📝 Planned        |
+| `PUT`    | `/api/expenses/{id}` | Update expense            | 🚧 In Development |
+| `DELETE` | `/api/expenses/{id}` | Delete expense            | 📝 Planned        |
 
 ### Authentication (Planned)
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|---------|
-| `POST` | `/api/auth/login` | User login | 📝 Planned |
+
+| Method | Endpoint             | Description       | Status     |
+| ------ | -------------------- | ----------------- | ---------- |
+| `POST` | `/api/auth/login`    | User login        | 📝 Planned |
 | `POST` | `/api/auth/register` | User registration | 📝 Planned |
-| `POST` | `/api/auth/logout` | User logout | 📝 Planned |
+| `POST` | `/api/auth/logout`   | User logout       | 📝 Planned |
 
 ### Reports (Planned)
-| Method | Endpoint | Description | Status |
-|--------|----------|-------------|---------|
-| `GET` | `/api/reports/summary` | Get expense summary | 📝 Planned |
-| `GET` | `/api/reports/category` | Get category breakdown | 📝 Planned |
+
+| Method | Endpoint                | Description            | Status     |
+| ------ | ----------------------- | ---------------------- | ---------- |
+| `GET`  | `/api/reports/summary`  | Get expense summary    | 📝 Planned |
+| `GET`  | `/api/reports/category` | Get category breakdown | 📝 Planned |
 
 ## 📱 Usage
 
 ### User Walkthrough
+
 1. **Welcome Screen**: User accesses login or registration
 2. **Dashboard**: View recent expenses and access "Add Expense" functionality
 3. **Add Expense**: Fill form with amount, category, date, and description
@@ -279,6 +258,7 @@ The application will start on `http://localhost:8080`
 6. **Account Management**: Edit or delete expense entries as needed
 
 ### Example Request (Future Implementation)
+
 ```json
 POST /api/expenses
 Content-Type: application/json
@@ -294,6 +274,7 @@ Content-Type: application/json
 ## 🧪 Testing
 
 ### Running Tests
+
 ```bash
 # Run all tests
 ./mvnw test
@@ -303,6 +284,7 @@ Content-Type: application/json
 ```
 
 ### Test Coverage
+
 - Unit tests for service layer components
 - Integration tests for API endpoints
 - Database interaction tests
@@ -311,18 +293,21 @@ Content-Type: application/json
 ## 🤝 Contributing
 
 ### Development Workflow
+
 1. Create a feature branch from `main`
 2. Implement changes with appropriate tests
 3. Submit pull request for review
 4. Merge after approval and testing
 
 ### Code Standards
+
 - Follow Java naming conventions
 - Document public methods with Javadoc
 - Maintain consistent formatting
 - Write comprehensive unit tests
 
 ### Communication Channels
+
 - **Discord**: Daily communication and quick questions
 - **Microsoft Teams**: Weekly meetings and screen-sharing
 - **GitHub Issues**: Bug tracking and feature requests
@@ -330,16 +315,17 @@ Content-Type: application/json
 
 ## 📅 Project Timeline
 
-| Phase | Timeline | Status |
-|-------|----------|---------|
-| **Planning & Design** | Weeks 1-2 | ✅ Complete |
+| Phase                            | Timeline  | Status         |
+| -------------------------------- | --------- | -------------- |
+| **Planning & Design**            | Weeks 1-2 | ✅ Complete    |
 | **Backend/Database Development** | Weeks 3-4 | 🚧 In Progress |
-| **Frontend Development** | Weeks 4-5 | 📝 Upcoming |
-| **Testing & Debugging** | Weeks 5-7 | 📝 Upcoming |
-| **Documentation** | Weeks 6-7 | 📝 Upcoming |
-| **Final Presentation** | Week 8 | 📝 Upcoming |
+| **Frontend Development**         | Weeks 4-5 | 📝 Upcoming    |
+| **Testing & Debugging**          | Weeks 5-7 | 📝 Upcoming    |
+| **Documentation**                | Weeks 6-7 | 📝 Upcoming    |
+| **Final Presentation**           | Week 8    | 📝 Upcoming    |
 
 ### Key Milestones
+
 - ✅ Project planning and team role assignment
 - ✅ Initial Spring Boot application setup
 - 🚧 Database schema and basic API endpoints
@@ -363,5 +349,4 @@ For questions or support, please contact the development team through our establ
 **CMSC 495: Computer Science Capstone**  
 **Fall 2025 - Group 3**
 
-*Last Updated: October 31, 2025*
->>>>>>> origin/feature/backend-eric-gray
+_Last Updated: October 31, 2025_
