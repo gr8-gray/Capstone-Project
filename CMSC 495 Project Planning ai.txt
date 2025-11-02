@@ -1,0 +1,250 @@
+
+
+
+
+Project Planning: Smart Expense Tracking Application
+University of Maryland Global Campus
+CMSC 495: Computer Science Capstone 
+Date: October 28th 2025
+Group 3 Team Members: 
+James Strange 
+John Malone 
+Eric Gray 
+Michael Basye 
+Duane Mitchell 
+Pukar Adhikari
+
+
+
+
+
+Table of Contents
+1.	Overview …………………………………………………………………… 2
+2.	Project Deliverables ………………………………………………………… 2
+3.	Project Scope ………………………………………………………………… 3
+4.	Team Member Roles ………………………………………………………… 4
+5.	Requirements ………………………………………………………………… 5
+6.	Case Scenario – User Walkthrough ………………………………………… 6
+7.	Schedule Summary with Milestones ………………………………………… 7
+8.	Communication Plan ………………………………………………………… 8
+9.	Risk Management …………………………………………………………… 9
+10.	Conclusion …………………………………………………………………… 10
+11.	References …………………………………………………………………… 10
+
+
+
+
+
+
+
+
+
+
+
+1. Overview
+This project plan describes Team Smart Expense Tracking’s approach to developing a web-based 
+application that enables users to record, categorize, and analyze their daily financial transactions. 
+It includes the project’s deliverables, scope, requirements, milestones, communication strategy, 
+and risk management plan. 
+The system will be implemented using Java for backend logic, MySQL for the database, and 
+HTML, CSS, and JavaScript for the frontend. The completed product will allow users to securely 
+enter transactions, view summaries, and visualize their spending habits through intuitive charts 
+and graphs.
+2. Project Deliverables
+The Smart Expense Tracking Application will include:
+*	A secure login and authentication system.
+*	A responsive web interface for entering and managing expenses.
+*	Categorization features for tracking spending types (food, transportation, utilities, etc..).
+*	Visual analytics such as charts, summaries, and reports.
+*	Technical documentation and a final presentation.
+The deliverables will be shared via a GitHub repository, accompanied by a live demonstration 
+and documentation packet detailing architecture, code structure, and testing procedures.
+3. Project Scope
+In Scope
+*	Expense entry, editing, and categorization.
+*	Secure user authentication and role-based access.
+*	Expense summaries and visual analytics.
+*	Administrative dashboard for user management.
+Out of Scope
+*	Mobile application version.
+*	Integration with external banking APIs.
+*	Predictive analytics or AI-based spending forecasts.
+*	Cloud synchronization across devices.
+This scope ensures focus on delivering a functional, high-quality prototype within the semester 
+timeline.
+
+
+
+4. Team Member Roles
+
+Role
+Responsibilities
+Member 1: Duane Mitchell
+Project Manager / Backend 
+Developer
+Oversees progress, manages milestones, ensures system 
+integration, and assists with backend implementation.
+Member 2: John Malone
+Frontend Lead
+Designs the UI/UX layout, implements responsive features, and 
+manages the visual interface.
+Member 3: Eric Gray
+Backend Developer (Java)
+Builds core Java modules, configures data handling, and 
+integrates backend services.
+Member 4: Michael Basye
+Database Engineer
+Designs the MySQL schema, creates queries, and ensures data 
+reliability and normalization.
+Member 5: Pukar Adhikari
+Frontend Developer / Tester
+Conducts testing, verifies UI functionality, and assists in bug 
+tracking.
+Member 6: James Strange
+QA Lead / Documentation 
+Specialist
+Manages testing documentation, ensures quality control, and 
+compiles final reports.
+All members collaborate through weekly check-ins and shared repositories to maintain version 
+consistency and progress visibility.
+5. Requirements
+Business Requirements
+*	Provide a simple and secure interface for managing daily expenses.
+*	Enable users to track, categorize, and analyze spending trends.
+*	Support data visualization through bar and pie charts.
+Functional Requirements
+*	User login/logout authentication.
+*	Expense entry with category selection and date.
+*	Expense list view and statistical summaries.
+*	Exportable summary reports (CSV / PDF format).
+Technical Requirements
+*	Operating System: Windows, macOS, or Linux (compatible with Java 17+).
+*	Software: IntelliJ IDEA / VS Code, MySQL Workbench.
+*	Language Stack: Java 17+, HTML, CSS, JavaScript.
+*	Version Control: GitHub repositories.
+
+
+
+6. Case Scenario: User Walkthrough
+A user logs into the Smart Expense Tracking Application for the first time.
+1.	The Welcome Screen prompts for login or account registration.
+2.	After logging in, the user accesses the Dashboard displaying recent expenses and a “+ 
+Add Expense” button.
+3.	Selecting Add Expense opens a form for entering the amount, category, and description.
+4.	Upon saving, the record appears in the transaction table with color-coded categories.
+5.	The user clicks View Report to see a pie chart of spending by category for the month.
+6.	Any incorrect entries can be edited or deleted from the dashboard.
+7.	When done, the user logs out; all data remain stored in the secure MySQL database.
+Error-handling scenarios include missing required fields, invalid input values, or incorrect login 
+attempts.
+7. Schedule Summary with Milestones
+
+Phase
+Task
+Responsible 
+Team Members
+Start 
+Date
+End 
+Date
+Planning & Design
+Define requirements, assign roles, 
+create UI mockups
+All Members
+Week 1
+Week 2
+Backend/Database 
+Development
+Develop Java logic and database 
+schema
+Backend Team
+Week 3
+Week 4
+Frontend 
+Development
+Implement interface and connect 
+to backend
+Frontend Team
+Week 4
+Week 5
+Testing & 
+Debugging
+Perform integration and unit tests
+All Members
+Week 5
+Week 7
+Documentation
+Prepare reports and user manual
+Documentation 
+Lead
+Week 6
+Week 7
+Presentation
+Final presentation and submission
+All Members
+Week 8
+Week 8
+The team will track progress using GitHub Projects and GitHub milestones, adjusting as needed 
+to stay aligned with the semester schedule.
+
+
+
+
+
+
+
+
+
+8. Communication Plan
+Primary communication will occur via Discord, supplemented by Microsoft Teams for formal 
+meetings. 
+Version control is maintained through GitHub, and project management tasks are tracked in 
+GitHub Projects.
+Tool
+Purpose
+Discord
+Daily communication, quick questions, brainstorming.
+Microsoft Teams
+Weekly meetings and screen-sharing demonstrations.
+GitHub
+Version control, code review, and repository management.
+GitHub Projects
+Task management, deadlines, and workload tracking.
+Google Drive
+Document storage, sharing, and collaborative editing.
+Weekly team meetings occur every Sunday at 12 PM PT, with additional mid-week check ins 
+as required. The Project Manager ensures attendance and accountability.
+9. Risk Management
+Common risks include schedule delays, integration conflicts, and technical misconfigurations. 
+Mitigation strategies are as follows:
+*	Schedule Delays: Adopt incremental sprints, assign clear task ownership, and monitor 
+progress through GitHub Projects.
+*	Integration Issues: Begin early backend-frontend testing and maintain standardized 
+APIs.
+*	Communication Gaps: Daily updates through Discord, weekly retrospectives.
+*	Uneven Workload: Rotate tasks and redistribute assignments as needed.
+*	Database Errors: Maintain shared documentation, use backups, and perform regular unit 
+testing.
+Proactive communication and transparent reporting will minimize these risks.
+10. Conclusion
+The Smart Expense Tracking Application demonstrates the team’s collaborative ability to design 
+and implement a functional, secure, and user-oriented financial tool. The structured timeline, 
+defined responsibilities, and risk-management strategies ensure a successful, on-time completion. 
+Through consistent collaboration, testing, and documentation, this project will provide a 
+professional prototype suitable for demonstration to stakeholders and potential users.
+
+
+
+11. References
+Oracle. (2024). Java Platform, Standard Edition documentation. https://docs.oracle.com/en/java/ 
+MySQL. (2024). MySQL reference manual. https://dev.mysql.com/doc/ 
+Mozilla Developer Network (MDN). (2024). JavaScript guide. https://developer.mozilla.org/
+
+1
+
+		1
+  
+			
+
+Project Plan v1		October 28, 2025
+
