@@ -26,22 +26,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless REST APIs
-            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Enable CORS
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(authz -> authz
-                // Permit access to authentication endpoints
-                .requestMatchers("/api/auth/**").permitAll()
-                // Permit access to public endpoints (for development/testing)
-                .requestMatchers("/api/expenses/**").permitAll() // TODO: Change to authenticated() when auth is implemented
-                // Health check and actuator endpoints
-                .requestMatchers("/actuator/**", "/health").permitAll()
-                // All other requests require authentication
-                .anyRequest().authenticated() 
-            );
-
-        // TODO: Add JWT filter configuration when implementing authentication
-        // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless REST APIs
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authz -> authz
+                        // Permit access to authentication endpoints
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Permit access to all API endpoints during development
+                        .requestMatchers("/api/expenses/**",
+                                "/api/budgets/**",
+                                "/api/reports/**").permitAll()
+                        // Health check and actuator endpoints
+                        .requestMatchers("/actuator/**", "/health").permitAll()
+                        // Everything else can stay protected (or also permitAll for dev)
+                        .anyRequest().authenticated()
+                );
 
         return http.build();
     }
