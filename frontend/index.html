@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Expense Tracker - Login</title>
+
+    <!-- Link to shared stylesheet for authentication and layout styling -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body class="auth-body">
+    <!-- ================= LOGIN PAGE CONTAINER ================= -->
+    <div class="auth-container">
+      <!-- App title -->
+      <h1>Smart Expense Tracker</h1>
+
+      <!-- ===== LOGIN FORM ===== -->
+      <form id="login-form">
+        <!-- Email field -->
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          placeholder="Enter your email" 
+          required 
+        />
+
+        <!-- Password field -->
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          placeholder="Enter your password" 
+          required 
+        />
+
+        <!-- Submit button for login -->
+        <button type="submit" class="btn-primary">Login</button>
+
+        <!-- Link to registration page -->
+        <p>
+          Don’t have an account?
+          <a href="register.html" class="link-register">Register here</a>
+        </p>
+      </form>
+    </div>
+  </body>
+</html>
