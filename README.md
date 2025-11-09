@@ -92,38 +92,54 @@ The Smart Expense Tracking Application provides a comprehensive solution for per
 ## 📁 Project Structure
 
 ```
-expense-api/
+SmartExpenseTrackingApp/
 ├── src/
 │   ├── main/
 │   │   ├── java/
 │   │   │   └── com/yourapp/expensetracker/expense_api/
-│   │   │       ├── ExpenseApiApplication.java          # Main application entry point
+│   │   │       ├── ExpenseApiApplication.java               # Main Spring Boot application entry point
+│   │   │       │
 │   │   │       ├── config/
-│   │   │       │   └── SecurityConfig.java             # Security configuration
-│   │   │       ├── controller/
-│   │   │       │   ├── AuthController.java             # Authentication endpoints
-│   │   │       │   ├── ExpenseController.java          # Expense CRUD operations
-│   │   │       │   └── ReportController.java           # Report generation
-│   │   │       ├── model/
-│   │   │       │   └── expense.java                    # Expense entity model
-│   │   │       ├── repository/
-│   │   │       │   └── ExpenseRepository.java          # Data access layer
-│   │   │       └── service/
-│   │   │           └── ExpenseService.java             # Business logic layer
+│   │   │       │   └── SecurityConfig.java                  # Spring Security configuration (CORS, CSRF, endpoints)
+│   │   │       │
+│   │   │       ├── controller/                              # REST API controllers
+│   │   │       │   ├── AuthController.java                  # Authentication endpoints (placeholder for future JWT/auth logic)
+│   │   │       │   ├── ExpenseController.java               # Expense CRUD operations and filters
+│   │   │       │   └── ReportController.java                # Expense reporting and analytics endpoints
+│   │   │       │
+│   │   │       ├── model/                                   # JPA entity models
+│   │   │       │   ├── Expense.java                         # Expense entity (transactions)
+│   │   │       │   ├── User.java                            # User entity (authentication and ownership)
+│   │   │       │   ├── Budget.java                          # Budget entity (planned spending limits)
+│   │   │       │   └── Category.java                        # Category entity (expense types)
+│   │   │       │
+│   │   │       ├── repository/                              # Data access layer (JPA repositories)
+│   │   │       │   ├── ExpenseRepository.java               # Expense data operations
+│   │   │       │   ├── UserRepository.java                  # User data operations
+│   │   │       │   ├── BudgetRepository.java                # Budget data operations
+│   │   │       │   └── CategoryRepository.java              # Category data operations
+│   │   │       │
+│   │   │       └── service/                                 # Business logic layer
+│   │   │           ├── ExpenseService.java                  # Handles expense-related logic
+│   │   │           ├── BudgetService.java                   # Handles budget management logic
+│   │   │           ├── ReportService.java                   # Generates reports and summaries
+│   │   │           └── CategoryService.java                 # Suggests and manages categories
+│   │   │
 │   │   └── resources/
-│   │       ├── application.properties                  # Application configuration
-│   │       ├── static/                                 # Static web resources
-│   │       └── templates/                              # View templates
+│   │       ├── application.properties                       # Database and app configuration (MySQL, Hibernate, etc.)
+│   │       ├── static/                                      # Static web assets (if used by frontend)
+│   │       └── templates/                                   # Thymeleaf or view templates (future use)
+│   │
 │   └── test/
 │       └── java/
 │           └── com/yourapp/expensetracker/expense_api/
-│               └── ExpenseApiApplicationTests.java     # Unit tests
-├── target/                                             # Compiled classes and artifacts
-├── pom.xml                                             # Maven configuration
-├── mvnw                                                # Maven wrapper (Unix)
-├── mvnw.cmd                                            # Maven wrapper (Windows)
-└── README.md                                           # Project documentation
-```
+│               └── ExpenseApiApplicationTests.java          # Unit and integration tests
+│
+├── target/                                                  # Compiled class files and build artifacts
+├── pom.xml                                                  # Maven configuration and dependencies
+├── mvnw                                                     # Maven wrapper (Unix)
+├── mvnw.cmd                                                 # Maven wrapper (Windows)
+└── README.md                                                # Project documentation```
 
 ## 📋 Prerequisites
 
