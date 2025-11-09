@@ -1,0 +1,436 @@
+﻿/* =======================================================
+   SMART EXPENSE TRACKER — MAIN STYLESHEET
+   Author: Pukar Adhikari (Frontend Developer / Tester)
+   Description:
+   Defines all visual styles for login, registration,
+   dashboard layout, tables, buttons, and responsive design.
+======================================================= */
+
+/* ======= GLOBAL STYLES ======= */
+/* Set base font, page background gradient, and flex layout */
+body {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #eef2f3, #8e9eab);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ======= HEADER ======= */
+/* Styles header background, title, and navigation links */
+header {
+  background-color: #007acc;
+  color: white;
+  width: 100%;
+  padding: 25px 0;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+
+/* Logout link in header */
+header nav a {
+  display: inline-block;
+  margin-top: 10px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+header nav a:hover {
+  color: #ffd166; /* gold hover accent */
+}
+
+/* ======= MAIN CONTENT ======= */
+/* Core dashboard container */
+main {
+  background: white;
+  width: 90%;
+  max-width: 800px;
+  margin-top: 40px;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ======= SECTION TITLES ======= */
+h2 {
+  color: #007acc;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+
+/* ======= FORM ======= */
+/* Layout for add expense form */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Input styles for text and numeric fields */
+input[type="text"],
+input[type="number"] {
+  flex: 1;
+  min-width: 180px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+/* Focus effect for input fields */
+input[type="text"]:focus,
+input[type="number"]:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.5);
+}
+
+/* Standard button styles */
+button {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: #005ea1;
+}
+
+/* ======= TABLE ======= */
+/* Expense table layout */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  border: 2px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+/* Table header styling */
+thead {
+  background-color: #007acc;
+  color: white;
+}
+
+/* Table cells */
+th, td {
+  padding: 12px 10px;
+  text-align: left;
+  border: 1px solid #ccc;
+  word-wrap: break-word;
+  vertical-align: top;
+}
+
+/* Zebra striping and hover highlight */
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #e6f2ff;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+/* ======= TOTAL ROW ======= */
+/* Style for table footer showing total */
+tfoot {
+  background-color: #f1f1f1;
+  font-weight: bold;
+  font-size: 16px;
+  border-top: 3px solid #007acc;
+}
+
+tfoot td {
+  padding: 14px;
+  text-align: right;
+  color: #333;
+}
+
+/* Column width adjustments */
+th:nth-child(1) td:nth-child(1) { width: 45%; }
+th:nth-child(2) td:nth-child(2) { width: 25%; }
+th:nth-child(3) td:nth-child(3) { width: 30%; }
+
+/* ======= RESPONSIVE DESIGN ======= */
+/* Handles various screen sizes down to mobile */
+
+/* Small tablets and mobile adjustments */
+@media (max-width: 600px) {
+  main { padding: 20px; }
+  form { flex-direction: column; align-items: stretch; }
+  button { width: 100%; }
+}
+
+/* ======= LOGIN / REGISTER PAGE STYLES ======= */
+/* Background and layout for authentication pages */
+.auth-body {
+  background: linear-gradient(135deg, #8e9eab, #eef2f3);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Centered card container for login/register */
+.auth-container {
+  background: white;
+  padding: 40px 50px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Form headings */
+.auth-container h1 {
+  color: #007acc;
+  margin-bottom: 25px;
+  font-size: 26px;
+}
+
+/* Authentication form layout */
+.auth-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-container label {
+  text-align: left;
+  color: #444;
+  font-weight: 500;
+}
+
+/* Input fields for login/register */
+.auth-container input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+/* Focus effect */
+.auth-container input:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.4);
+}
+
+/* Primary button styling */
+.btn-primary {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover { background-color: #005ea1; }
+
+/* Link styling for login/register switch */
+.link-register {
+  color: #007acc;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.link-register:hover { text-decoration: underline; }
+
+/* ======= BUTTON STYLES (Edit/Delete/Save) ======= */
+.edit-btn {
+  background: #ffcc00;
+  color: #000;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.edit-btn:hover { background: #e6b800; }
+
+.delete-btn {
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.delete-btn:hover { background: #d93636; }
+
+/* Inline editing input styling */
+.edit-input {
+  width: 85%;
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #aaa;
+  border-radius: 4px;
+}
+
+/* Save button override */
+.save-btn { background:#4CAF50 !important; color:#fff !important; }
+
+/* Inline input and select for edit mode */
+td input, td select {
+  width: 90%;
+  padding: 5px;
+  font-size: 14px;
+}
+
+/* Highlight edited row */
+tr.editing { background: #fff9c4; }
+
+/* ======= RESPONSIVE BREAKPOINTS ======= */
+
+/* Tablets (below 900px) */
+@media (max-width: 900px) {
+  main { width: 95%; margin: 20px auto; padding: 15px; }
+  h1 { font-size: 22px; }
+  h2 { font-size: 18px; }
+}
+
+/* Smaller tablets (below 768px) */
+@media (max-width: 768px) {
+  form {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  form input,
+  form select,
+  form button {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  table { font-size: 15px; }
+  th, td { padding: 8px; }
+}
+
+/* Phones (below 500px) */
+@media (max-width: 500px) {
+  header { padding: 12px; }
+  header h1 { font-size: 18px; margin-bottom: 5px; }
+  nav a { font-size: 14px; }
+
+  main {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+  form {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  form input,
+  form select {
+    width: 100%;
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 6px;
+  }
+
+  form button {
+    font-size: 15px;
+    padding: 10px;
+    border-radius: 6px;
+  }
+
+  /* Scrollable table for small screens */
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    font-size: 14px;
+    border: 1px solid #ccc;
+  }
+
+  th, td { padding: 8px; }
+
+  /* Custom scrollbar for table */
+  table::-webkit-scrollbar { height: 6px; }
+  table::-webkit-scrollbar-thumb {
+    background: #007acc;
+    border-radius: 3px;
+  }
+
+  /* Compact action buttons */
+  .edit-btn, .delete-btn {
+    padding: 4px 6px;
+    font-size: 13px;
+    margin: 0 2px;
+  }
+}
+
+/* ======= CHART & REPORT STYLES ======= */
+/* Section styling for summary or charts */
+#summary, #monthly {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+
+/* Canvas scaling for responsive Chart.js charts */
+canvas {
+  max-width: 100%;
+  margin-top: 10px;
+}
+
+/* Secondary button (View Reports) */
+.btn-secondary {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover { background-color: #0097a7; }
+
+/* Dropdown for selecting months in reports */
+#monthFilter {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 15px;
+  margin-left: 10px;
+}
