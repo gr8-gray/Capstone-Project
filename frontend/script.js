@@ -20,7 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Helper functions for formatting currency and date
   const fmtMoney = (n) => `$${Number(n).toFixed(2)}`;
-  const toLocale = (iso) => new Date(iso).toLocaleDateString();
+  const toLocale = (iso) => { const [year, month, day] = iso.split("-");
+  return `${month}/${day}/${year}`;
+};
 
   // ===== SAVE EXPENSES TO LOCAL STORAGE =====
   function saveExpenses() {

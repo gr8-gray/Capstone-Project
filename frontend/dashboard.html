@@ -14,7 +14,7 @@
   <header>
     <h1>Smart Expense Tracker</h1>
     <nav>
-      <!-- Logout button (handled by JS script) -->
+      <!-- Logout button  -->
       <a href="#" id="logoutBtn">Logout</a>
     </nav>
   </header>
@@ -43,7 +43,7 @@
           <option value="Other">Other</option>
         </select>
 
-        <!-- Input: Expense amount (supports decimals) -->
+        <!-- Input: Expense amount -->
         <input type="number" id="expense-amount" placeholder="Amount ($)" step="0.01" min="0" required/>
 
         <!-- Input: Expense date -->
@@ -58,29 +58,31 @@
     <section id="expense-history">
       <h2>Expense History</h2>
 
-      <!-- Expense Table -->
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Amount ($)</th>
-            <th>Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+  <!--  WRAP THE TABLE -->
+  <div class="table-wrapper">
 
-        <!-- Table Body: dynamically filled with expenses via script.js -->
-        <tbody id="table-body"></tbody>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Amount ($)</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
 
-        <!-- Table Footer: shows calculated total -->
-        <tfoot>
-          <tr>
-            <td><strong>Total</strong></td>
-            <td id="total-cell" colspan="4"><strong>$0.00</strong></td>
-          </tr>
-        </tfoot>
-      </table>
+      <tbody id="table-body"></tbody>
+
+      <tfoot>
+        <tr>
+          <td><strong>Total</strong></td>
+          <td id="total-cell" colspan="4"><strong>$0.00</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+
+  </div> <!-- END table-wrapper -->
 
       <!-- ===== Chart Toggle Button ===== -->
       <div style="text-align:center;margin-top:20px;">
@@ -88,7 +90,7 @@
         <button id="viewReportBtn" class="btn-secondary">📊 View Reports</button>
       </div>
 
-      <!-- ===== Chart Section (initially hidden) ===== -->
+      <!-- ===== Chart Section ===== -->
       <div id="chartSection" style="display:none;margin-top:30px;">
         <h2>Expense Insights</h2>
 
