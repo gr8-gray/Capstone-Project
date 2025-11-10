@@ -53,6 +53,156 @@ public class ReportService {
     }
 
     /**
+     * Generate monthly report (alias for getMonthlyExpenseSummary)
+     * Used by integration tests
+     */
+    public Map<String, Object> getMonthlyReport(int year, int month) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        LocalDate startDate = yearMonth.atDay(1);
+        LocalDate endDate = yearMonth.atEndOfMonth();
+        
+        List<Expense> expenses = expenseRepository.findByDateBetween(startDate, endDate);
+        
+        Map<String, Object> report = new HashMap<>();
+        report.put("month", month);
+        report.put("year", year);
+        report.put("expenseCount", expenses.size());
+        report.put("totalExpenses", getTotalAmount(expenses));
+        report.put("expenses", expenses);
+        report.put("categoryBreakdown", getCategoryBreakdown(expenses));
+        
+        return report;
+    }
+
+    /**
+     * Generate yearly report
+     */
+    public Map<String, Object> getYearlyReport(int year) {
+        LocalDate startDate = LocalDate.of(year, 1, 1);
+        LocalDate endDate = LocalDate.of(year, 12, 31);
+        
+        List<Expense> expenses = expenseRepository.findByDateBetween(startDate, endDate);
+        
+        Map<String, Object> report = new HashMap<>();
+        report.put("year", year);
+        report.put("totalExpenses", getTotalAmount(expenses));
+        report.put("expenseCount", expenses.size());
+        report.put("monthlyBreakdown", getMonthlyTrends(expenses));
+        report.put("categoryBreakdown", getCategoryBreakdown(expenses));
+        report.put("averageMonthly", getAverageMonthly(expenses));
+        
+        return report;
+    }
+
+    /**
+     * Get category breakdown for date range
+     * Overloaded version that takes date parameters
+     */
+    public Map<String, BigDecimal> getCategoryBreakdown(LocalDate startDate, LocalDate endDate) {
+        List<Expense> expenses = expenseRepository.findByDateBetween(startDate, endDate);
+        return getCategoryBreakdown(expenses);
+    }
+
+    /**
+     * Get total expenses for date range
+     */
+    public BigDecimal getTotalForDateRange(LocalDate startDate, LocalDate endDate) {
+        List<Expense> expenses = expenseRepository.findByDateBetween(startDate, endDate);
+        return getTotalAmount(expenses);
+    }
+
+    /**
+     * Get top expense categories for date range
+     */
+    public Map<String, BigDecimal> getTopExpenseCategories(LocalDate startDate, LocalDate endDate, int limit) {
+        List<Expense> expenses = expenseRepository.findByDateBetween(startDate, endDate);
+        Map<String, BigDecimal> categoryTotals = getCategoryBreakdown(expenses);
+        
+        return categoryTotals.entrySet().stream()
+                .sorted(Map.Entry.<String, BigDecimal>comparingByValue().reversed())
+                .limit(limit)
+                .collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue,
+                    (e1, e2) -> e1,
+                    LinkedHashMap::new
+                ));
+    }
+
+    /**
+     * Get average daily expense for date range
+     */
+    public BigDecimal getAverageDailyExpense(LocalDate startDate, LocalDate endDate) {
+        List<Expense> expenses = expenseRepository.findByDateBetween(startDate, endDate);
+        return getAverageDaily(expenses, startDate, endDate);
+    }
+
+    /**
+     * Compare expenses between two months
+     */
+    public Map<String, Object> compareMonths(int year1, int month1, int year2, int month2) {
+        // Get first month data
+        YearMonth yearMonth1 = YearMonth.of(year1, month1);
+        LocalDate start1 = yearMonth1.atDay(1);
+        LocalDate end1 = yearMonth1.atEndOfMonth();
+        List<Expense> expenses1 = expenseRepository.findByDateBetween(start1, end1);
+        BigDecimal total1 = getTotalAmount(expenses1);
+        
+        // Get second month data
+        YearMonth yearMonth2 = YearMonth.of(year2, month2);
+        LocalDate start2 = yearMonth2.atDay(1);
+        LocalDate end2 = yearMonth2.atEndOfMonth();
+        List<Expense> expenses2 = expenseRepository.findByDateBetween(start2, end2);
+        BigDecimal total2 = getTotalAmount(expenses2);
+        
+        // Calculate comparison
+        BigDecimal difference = total2.subtract(total1);
+        double percentChange = calculatePercentageChange(total1, total2);
+        
+        Map<String, Object> comparison = new HashMap<>();
+        comparison.put("month1", month1);
+        comparison.put("year1", year1);
+        comparison.put("month1Total", total1);
+        comparison.put("month1Count", expenses1.size());
+        comparison.put("month2", month2);
+        comparison.put("year2", year2);
+        comparison.put("month2Total", total2);
+        comparison.put("month2Count", expenses2.size());
+        comparison.put("difference", difference);
+        comparison.put("percentChange", percentChange);
+        
+        return comparison;
+    }
+
+    /**
+     * Get category report with specified category filter
+     * Overloaded version for specific category
+     */
+    public Map<String, Object> getCategoryReport(String category, LocalDate startDate, LocalDate endDate) {
+        List<Expense> expenses = expenseRepository.findByCategoryAndDateBetween(category, startDate, endDate);
+        
+        Map<String, Object> report = new HashMap<>();
+        report.put("category", category);
+        report.put("startDate", startDate);
+        report.put("endDate", endDate);
+        report.put("total", getTotalAmount(expenses));
+        report.put("expenseCount", expenses.size());
+        report.put("expenses", expenses);
+        report.put("averageExpense", getAverageExpenseAmount(expenses));
+        
+        return report;
+    }
+
+    /**
+     * Get weekly trends for date range
+     * Overloaded version that takes date parameters
+     */
+    public Map<String, BigDecimal> getWeeklyTrends(LocalDate startDate, LocalDate endDate) {
+        List<Expense> expenses = expenseRepository.findByDateBetween(startDate, endDate);
+        return getWeeklyTrends(expenses);
+    }
+
+    /**
      * Generate category-wise expense report
      */
     public Map<String, Object> getCategoryReport(LocalDate startDate, LocalDate endDate) {

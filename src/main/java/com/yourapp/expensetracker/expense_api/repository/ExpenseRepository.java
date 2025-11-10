@@ -44,9 +44,29 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     List<Expense> findByAmountLessThanEqual(BigDecimal amount);
 
     /**
+     * Find expenses greater than amount
+     */
+    List<Expense> findByAmountGreaterThan(BigDecimal amount);
+
+    /**
+     * Find expenses between min and max amount
+     */
+    List<Expense> findByAmountBetween(BigDecimal minAmount, BigDecimal maxAmount);
+
+    /**
      * Find expenses by description containing keyword (case-insensitive)
      */
     List<Expense> findByDescriptionContainingIgnoreCase(String keyword);
+
+    /**
+     * Find all expenses ordered by date descending
+     */
+    List<Expense> findAllByOrderByDateDesc();
+
+    /**
+     * Find top N expenses ordered by amount descending
+     */
+    List<Expense> findTop3ByOrderByAmountDesc();
 
     /**
      * Get sum of expenses by category within date range

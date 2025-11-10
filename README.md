@@ -355,7 +355,55 @@ Content-Type: application/json
 
 This project is developed as an academic assignment for UMGC CMSC 495. All rights reserved to the contributing team members.
 
-## 📞 Support
+## 🧪 Integration Testing
+
+### Running Tests
+
+```bash
+# Run all tests
+./mvnw test
+
+# Run tests with detailed output
+./mvnw test -X
+
+# Run specific test class
+./mvnw test -Dtest=ExpenseControllerIntegrationTest
+```
+
+### Test Coverage Summary
+
+- **49 Integration Tests** covering all layers
+- **Controller Layer**: 13 tests for REST API endpoints
+- **Service Layer**: 13 tests for business logic
+- **Repository Layer**: 12 tests for database operations
+- **Report Service**: 10 tests for analytics features
+- **Application Context**: 1 smoke test
+
+### Test Configuration
+
+Tests use H2 in-memory database with profile `test`:
+- Configured in `src/test/resources/application-test.properties`
+- Automatic schema generation from JPA entities
+- Isolated test data for each test
+
+## � Report API Endpoints
+
+The application provides comprehensive reporting endpoints:
+
+### Analytics Endpoints
+
+- `GET /api/reports/yearly?year=2025` - Yearly expense report
+- `GET /api/reports/monthly?year=2025&month=10` - Monthly report
+- `GET /api/reports/category-breakdown?startDate=...&endDate=...` - Category breakdown
+- `GET /api/reports/total?startDate=...&endDate=...` - Total expenses
+- `GET /api/reports/top-categories?startDate=...&endDate=...&limit=5` - Top spending categories
+- `GET /api/reports/average-daily?startDate=...&endDate=...` - Average daily expenses
+- `GET /api/reports/compare-months?year1=...&month1=...&year2=...&month2=...` - Month comparison
+- `GET /api/reports/weekly-trends?startDate=...&endDate=...` - Weekly spending trends
+
+For complete endpoint documentation, see the API reference above.
+
+## �📞 Support
 
 For questions or support, please contact the development team through our established communication channels or create an issue in the GitHub repository.
 
@@ -365,4 +413,4 @@ For questions or support, please contact the development team through our establ
 **CMSC 495: Computer Science Capstone**  
 **Fall 2025 - Group 3**
 
-_Last Updated: October 31, 2025_
+_Last Updated: November 9, 2025_
