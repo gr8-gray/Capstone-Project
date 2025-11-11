@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql:
+    image: mysql:8.0
+    container_name: expense-tracker-mysql
+    environment:
+      MYSQL_DATABASE: expense_db
+      MYSQL_USER: expense_user
+      MYSQL_PASSWORD: expense_password
+      MYSQL_ROOT_PASSWORD: expense_password
+    ports:
+      - "3306:3306"
+    volumes:
+      # Persist database data
+      - mysql-data:/var/lib/mysql
+      # Initialize database with schema
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    networks:
+      - expense-tracker-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "expense_user", "-pexpense_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Spring Boot Backend Service (Optional - if you want to containerize backend too)
+  # Uncomment the section below if you want to run backend in Docker as well
+  
+  # backend:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.backend
+  #   container_name: expense-tracker-backend
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/expense_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  #     SPRING_DATASOURCE_USERNAME: expense_user
+  #     SPRING_DATASOURCE_PASSWORD: expense_password
+  #   depends_on:
+  #     mysql:
+  #       condition: service_healthy
+  #   networks:
+  #     - expense-tracker-network
+  #   restart: unless-stopped
+
+volumes:
+  mysql-data:
+    driver: local
+
+networks:
+  expense-tracker-network:
+    driver: bridge

@@ -1,0 +1,16 @@
+# Use official MySQL image
+FROM mysql:8.0
+
+# Set environment variables
+ENV MYSQL_DATABASE=expense_db
+ENV MYSQL_USER=expense_user
+ENV MYSQL_PASSWORD=expense_password
+ENV MYSQL_ROOT_PASSWORD=expense_password
+
+# Copy initialization scripts
+COPY database/schema.sql /docker-entrypoint-initdb.d/01-schema.sql
+
+# Expose MySQL port
+EXPOSE 3306
+
+# MySQL will automatically run scripts in /docker-entrypoint-initdb.d/ on first startup

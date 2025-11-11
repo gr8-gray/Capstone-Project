@@ -145,8 +145,8 @@ SmartExpenseTrackingApp/
 
 Before running this application, ensure you have the following installed:
 
-- **Java Development Kit (JDK) 21+**
-- **MySQL 8.0+**
+- **Docker Desktop** - For running MySQL database ([Download](https://www.docker.com/products/docker-desktop/))
+- **Java Development Kit (JDK) 17+**
 - **Maven 3.6+** (or use included Maven wrapper)
 - **Git** (for version control)
 
@@ -156,84 +156,118 @@ Before running this application, ensure you have the following installed:
 - Visual Studio Code with Java Extension Pack
 - Eclipse IDE for Java Developers
 
-## 🚀 Installation & Setup
+## 🚀 Quick Start with Docker
 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-team/smart-expense-tracker.git
-cd smart-expense-tracker/expense-api
+git clone https://github.com/dmitc072/SmartExpenseTrackingApp.git
+cd SmartExpenseTrackingApp
 ```
 
-### 2. Database Setup
+### 2. Start MySQL Database (Docker)
 
-1. Install and start MySQL server
-2. Create a new database:
+```powershell
+# Start MySQL container with Docker Compose
+docker compose up -d
 
-```sql
-CREATE DATABASE expense_db;
-CREATE USER 'expense_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON expense_db.* TO 'expense_user'@'localhost';
-FLUSH PRIVILEGES;
+# Verify MySQL is running
+docker ps
 ```
 
-### 3. Configure Application Properties
+**What this does:**
+- Downloads MySQL 8.0 image (first time only)
+- Creates `expense_db` database
+- Creates `expense_user` with password `expense_password`
+- Initializes database schema automatically from `database/schema.sql`
+- Runs MySQL on port 3306
 
-Update `src/main/resources/application.properties`:
-
-```properties
-spring.application.name=expense-api
-
-# MySQL Database Connection
-spring.datasource.url=jdbc:mysql://localhost:3306/expense_db
-spring.datasource.username=expense_user
-spring.datasource.password=your_password
-
-# JPA/Hibernate Settings
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+**Alternative:** Use the interactive setup script:
+```powershell
+.\setup-docker.ps1
+# Choose option 1
 ```
+
+### 3. Start Backend Server
+
+```powershell
+# Using Maven wrapper (recommended)
+.\mvnw.cmd spring-boot:run
+
+# Or using Maven directly
+mvn spring-boot:run
+```
+
+Wait for: `Started ExpenseApiApplication in X.XXX seconds`
+
+### 4. Test the Integration
+
+```powershell
+# Run automated integration tests
+.\test-integration.ps1
+
+# Or manually test the frontend
+start frontend\dashboard.html
+```
+
+---
+
+## 📚 Detailed Setup Guides
+
+- **Docker Setup**: See [README_DOCKER.md](README_DOCKER.md) for complete Docker guide
+- **Team Onboarding**: See [TEAM_ONBOARDING.md](TEAM_ONBOARDING.md) for new team member setup
+- **Architecture**: See [ARCHITECTURE.md](ARCHITECTURE.md) for system architecture details
 
 ## ⚙️ Configuration
 
 ### Development Environment
 
-- The application uses `spring.jpa.hibernate.ddl-auto=update` for automatic schema updates
-- SQL queries are logged when `spring.jpa.show-sql=true`
-- Default server port is 8080
+The application is pre-configured to work with Docker MySQL:
 
-### Production Considerations
+- **Database URL**: `jdbc:mysql://localhost:3306/expense_db`
+- **Username**: `expense_user`
+- **Password**: `expense_password`
+- **Server Port**: 8080
 
-- Change `ddl-auto` to `validate` or `none` in production
-- Configure proper logging levels
-- Set up environment-specific profiles
-- Configure SSL/TLS for secure connections
+Configuration file: `src/main/resources/application.properties`
 
-## 🏃‍♂️ Running the Application
+### Docker Commands
 
-### Using Maven Wrapper (Recommended)
+```powershell
+# Start MySQL
+docker compose up -d
 
-```bash
-# On Windows
-./mvnw.cmd spring-boot:run
+# Stop MySQL (keeps data)
+docker compose stop
 
-# On Unix/Linux/macOS
-./mvnw spring-boot:run
+# Restart MySQL
+docker compose start
+
+# Stop and remove (fresh start)
+docker compose down -v && docker compose up -d
+
+# View logs
+docker compose logs -f
 ```
 
-### Using Maven Directly
+### Running the Backend
 
-```bash
-mvn spring-boot:run
+```powershell
+# Using Maven wrapper (recommended)
+.\mvnw.cmd spring-boot:run
+
+# Using IDE
+# Import as Maven project and run ExpenseApiApplication.java
 ```
-
-### Using IDE
-
-1. Import the project as a Maven project
-2. Run `ExpenseApiApplication.java` as a Java application
 
 The application will start on `http://localhost:8080`
+
+### Frontend Access
+
+Open `frontend/dashboard.html` in your browser or:
+```powershell
+start frontend\dashboard.html
+```
 
 ## 🔌 API Endpoints
 

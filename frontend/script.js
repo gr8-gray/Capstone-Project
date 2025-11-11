@@ -1,10 +1,14 @@
 // ================= SMART EXPENSE TRACKER =================
 // Author: Pukar Adhikari (Frontend Developer / Tester)
+// Modified: Connected to Backend API by Eric Gray
 // Description: Handles all dashboard functionality including
 // adding, editing, deleting expenses, rendering totals, charts,
 // and managing logout behavior.
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  // ===== API CONFIGURATION =====
+  const API_BASE_URL = "http://localhost:8080/api/expenses";
 
   // ===== DOM ELEMENT REFERENCES =====
   const form = document.getElementById("expense-form");         // Add Expense form
@@ -15,21 +19,76 @@ document.addEventListener("DOMContentLoaded", () => {
   const tbody = document.getElementById("table-body");          // Table body for listing expenses
   const totalCell = document.getElementById("total-cell");      // Total amount cell
 
-  // Retrieve existing expenses from localStorage (if any)
-  let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
+  // Store expenses in memory (loaded from backend)
+  let expenses = [];
 
   // Helper functions for formatting currency and date
   const fmtMoney = (n) => `$${Number(n).toFixed(2)}`;
   const toLocale = (iso) => new Date(iso).toLocaleDateString();
 
-  // ===== SAVE EXPENSES TO LOCAL STORAGE =====
-  function saveExpenses() {
-    localStorage.setItem("expenses", JSON.stringify(expenses));
+  // ===== API HELPER FUNCTIONS =====
+  
+  // Fetch all expenses from backend
+  async function fetchExpenses() {
+    try {
+      const response = await fetch(API_BASE_URL);
+      if (!response.ok) throw new Error("Failed to fetch expenses");
+      expenses = await response.json();
+      renderTable();
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+      alert("Failed to load expenses from server. Please check if the backend is running.");
+    }
+  }
+
+  // Add new expense to backend
+  async function addExpense(expenseData) {
+    try {
+      const response = await fetch(API_BASE_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(expenseData)
+      });
+      if (!response.ok) throw new Error("Failed to create expense");
+      return await response.json();
+    } catch (error) {
+      console.error("Error adding expense:", error);
+      throw error;
+    }
+  }
+
+  // Update expense on backend
+  async function updateExpense(id, expenseData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(expenseData)
+      });
+      if (!response.ok) throw new Error("Failed to update expense");
+      return await response.json();
+    } catch (error) {
+      console.error("Error updating expense:", error);
+      throw error;
+    }
+  }
+
+  // Delete expense from backend
+  async function deleteExpense(id) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: "DELETE"
+      });
+      if (!response.ok) throw new Error("Failed to delete expense");
+    } catch (error) {
+      console.error("Error deleting expense:", error);
+      throw error;
+    }
   }
 
   // ===== RECALCULATE AND DISPLAY TOTAL =====
   function recalcTotal() {
-    const sum = expenses.reduce((acc, e) => acc + e.amount, 0);
+    const sum = expenses.reduce((acc, e) => acc + Number(e.amount), 0);
     totalCell.innerHTML = `<strong>${fmtMoney(sum)}</strong>`;
   }
 
@@ -39,13 +98,13 @@ document.addEventListener("DOMContentLoaded", () => {
     expenses.forEach((exp, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
-        <td>${exp.name}</td>
+        <td>${exp.description}</td>
         <td>${exp.category}</td>
         <td>${fmtMoney(exp.amount)}</td>
         <td>${toLocale(exp.date)}</td>
         <td>
-          <button class="edit-btn" data-index="${index}">✏️</button>
-          <button class="delete-btn" data-index="${index}">❌</button>
+          <button class="edit-btn" data-id="${exp.id}" data-index="${index}">✏️</button>
+          <button class="delete-btn" data-id="${exp.id}" data-index="${index}">❌</button>
         </td>
       `;
       tbody.appendChild(row);
@@ -54,39 +113,56 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===== ADD NEW EXPENSE =====
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     // Get form values
-    const name = nameEl.value.trim();
+    const description = nameEl.value.trim();
     const category = catEl.value;
     const amount = Number(amtEl.value);
     const date = dateEl.value;
 
     // Validate all fields
-    if (!name || !category || !date || amount <= 0) {
+    if (!description || !category || !date || amount <= 0) {
       alert("Please fill out all fields correctly.");
       return;
     }
 
-    // Add new expense and update table
-    expenses.push({ name, category, amount, date });
-    saveExpenses();
-    renderTable();
-    form.reset(); // Clear form inputs
+    // Create expense object matching backend model
+    const expenseData = {
+      description,
+      category,
+      amount,
+      date
+    };
+
+    try {
+      // Add new expense via API
+      await addExpense(expenseData);
+      await fetchExpenses(); // Reload expenses from backend
+      form.reset(); // Clear form inputs
+      alert("Expense added successfully!");
+    } catch (error) {
+      alert("Failed to add expense. Please try again.");
+    }
   });
 
   // ===== HANDLE EDIT AND DELETE BUTTONS =====
-  tbody.addEventListener("click", (e) => {
+  tbody.addEventListener("click", async (e) => {
     const target = e.target;
     const index = target.dataset.index;
+    const expenseId = target.dataset.id;
 
     // --- DELETE EXPENSE ---
     if (target.classList.contains("delete-btn")) {
       if (confirm("Delete this expense?")) {
-        expenses.splice(index, 1);
-        saveExpenses();
-        renderTable();
+        try {
+          await deleteExpense(expenseId);
+          await fetchExpenses(); // Reload expenses from backend
+          alert("Expense deleted successfully!");
+        } catch (error) {
+          alert("Failed to delete expense. Please try again.");
+        }
       }
     }
 
@@ -98,7 +174,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // Create editable input fields
       const nameInput = document.createElement("input");
       nameInput.type = "text";
-      nameInput.value = exp.name;
+      nameInput.value = exp.description;
 
       // Dropdown for category options
       const categorySelect = document.createElement("select");
@@ -137,9 +213,9 @@ document.addEventListener("DOMContentLoaded", () => {
       target.style.color = "white";
 
       // Save updated expense when clicked again
-      target.onclick = () => {
+      target.onclick = async () => {
         const updatedExpense = {
-          name: nameInput.value.trim(),
+          description: nameInput.value.trim(),
           category: categorySelect.value,
           amount: parseFloat(amountInput.value),
           date: dateInput.value,
@@ -147,7 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Validate before saving
         if (
-          !updatedExpense.name ||
+          !updatedExpense.description ||
           !updatedExpense.category ||
           isNaN(updatedExpense.amount) ||
           updatedExpense.amount <= 0 ||
@@ -157,16 +233,20 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
 
-        // Update expense and refresh table
-        expenses[index] = updatedExpense;
-        saveExpenses();
-        renderTable();
+        try {
+          // Update expense via API
+          await updateExpense(expenseId, updatedExpense);
+          await fetchExpenses(); // Reload expenses from backend
+          alert("Expense updated successfully!");
+        } catch (error) {
+          alert("Failed to update expense. Please try again.");
+        }
       };
     }
   });
 
   // ===== INITIALIZE TABLE ON PAGE LOAD =====
-  renderTable();
+  fetchExpenses(); // Load expenses from backend on page load
 
   // ===== CHARTS SECTION =====
   const viewBtn = document.getElementById("viewReportBtn");   // Button to toggle charts
@@ -191,7 +271,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== RENDER CHARTS FUNCTION =====
   function renderCharts(selectedMonth = "all") {
-    const savedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
+    // Use expenses from backend (already loaded in memory)
+    const savedExpenses = expenses;
 
     // --- Filter expenses by selected month ---
     const filteredExpenses = savedExpenses.filter((exp) => {
@@ -203,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- Aggregate by category for Pie Chart ---
     const categoryTotals = {};
     filteredExpenses.forEach((exp) => {
-      categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + exp.amount;
+      categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + Number(exp.amount);
     });
 
     const categories = Object.keys(categoryTotals);
@@ -213,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthlyTotals = {};
     savedExpenses.forEach((exp) => {
       const month = new Date(exp.date).toLocaleString("default", { month: "short" });
-      monthlyTotals[month] = (monthlyTotals[month] || 0) + exp.amount;
+      monthlyTotals[month] = (monthlyTotals[month] || 0) + Number(exp.amount);
     });
 
     const months = Object.keys(monthlyTotals);
@@ -282,11 +363,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const confirmLogout = confirm("Are you sure you want to log out?");
       if (!confirmLogout) return;
 
-      // Temporary logout (localStorage only)
-      console.log("Simulated logout — backend integration pending.");
+      // Clear expenses from memory
+      expenses = [];
 
-      // Clear temporary data
-      localStorage.removeItem("expenses");
+      // TODO: Call backend logout endpoint when authentication is implemented
+      console.log("Logout — backend authentication to be implemented.");
 
       // Redirect back to login page
       window.location.href = "index.html";

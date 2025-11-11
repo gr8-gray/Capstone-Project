@@ -60,3 +60,11 @@ build/
 
 ### Visual Studio ###
 .vs/
+
+### Docker ###
+# Don't ignore docker-compose.yml (needed by team)
+# Don't ignore Dockerfile.* (needed by team)
+# Only ignore runtime files
+.env
+docker-compose.override.yml
+*.log
