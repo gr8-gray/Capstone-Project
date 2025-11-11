@@ -325,20 +325,48 @@ Content-Type: application/json
 
 ### Running Tests
 
-```bash
-# Run all tests
-./mvnw test
+The application supports two testing modes:
+
+#### 1. Fast Unit Tests (H2 Database - Default)
+```powershell
+# Run all tests with H2 in-memory database
+.\mvnw.cmd test
 
 # Run specific test class
-./mvnw test -Dtest=ExpenseApiApplicationTests
+.\mvnw.cmd test -Dtest=ExpenseApiApplicationTests
 ```
+**Best for**: Fast feedback during development, CI/CD pipelines
+
+#### 2. Integration Tests (Docker MySQL)
+```powershell
+# Ensure Docker MySQL is running first
+docker ps
+
+# Run all tests with Docker MySQL
+.\mvnw.cmd test "-Dspring.profiles.active=docker"
+```
+**Best for**: End-to-end integration testing, pre-deployment validation
 
 ### Test Coverage
 
-- Unit tests for service layer components
-- Integration tests for API endpoints
-- Database interaction tests
-- Security configuration tests
+- **49 Integration Tests** covering all application layers:
+  - **Controller Layer**: 13 tests for REST API endpoints
+  - **Service Layer**: 13 tests for business logic
+  - **Repository Layer**: 12 tests for database operations
+  - **Report Service**: 10 tests for analytics features
+  - **Application Context**: 1 smoke test
+
+### Test Configuration
+
+- **Default Profile (`test`)**: Uses H2 in-memory database
+  - Location: `src/test/resources/application-test.properties`
+  - Automatic schema generation
+  - Isolated test data for each test class
+  
+- **Docker Profile (`docker`)**: Uses Docker MySQL database
+  - Location: `src/test/resources/application-docker.properties`
+  - Tests against real MySQL database
+  - Requires Docker container to be running
 
 ## 🤝 Contributing
 
@@ -391,34 +419,64 @@ This project is developed as an academic assignment for UMGC CMSC 495. All right
 
 ## 🧪 Integration Testing
 
-### Running Tests
+### Dual Testing Strategy
 
-```bash
-# Run all tests
-./mvnw test
+The application provides two testing modes for different use cases:
 
-# Run tests with detailed output
-./mvnw test -X
+#### Fast Unit Tests (H2 Database)
+```powershell
+# Run all tests with H2 in-memory database (default)
+.\mvnw.cmd test
+
+# Run with detailed output
+.\mvnw.cmd test -X
 
 # Run specific test class
-./mvnw test -Dtest=ExpenseControllerIntegrationTest
+.\mvnw.cmd test -Dtest=ExpenseControllerIntegrationTest
 ```
+✅ **Use for**: Fast feedback loops, CI/CD pipelines, development
+
+#### Docker Integration Tests (MySQL)
+```powershell
+# Ensure Docker MySQL is running
+docker ps --filter "name=expense-tracker-mysql"
+
+# Run all tests against Docker MySQL
+.\mvnw.cmd test "-Dspring.profiles.active=docker"
+```
+✅ **Use for**: End-to-end validation, pre-deployment testing, realistic scenarios
 
 ### Test Coverage Summary
 
-- **49 Integration Tests** covering all layers
+- **49 Integration Tests** covering all application layers
 - **Controller Layer**: 13 tests for REST API endpoints
-- **Service Layer**: 13 tests for business logic
+- **Service Layer**: 13 tests for business logic  
 - **Repository Layer**: 12 tests for database operations
 - **Report Service**: 10 tests for analytics features
 - **Application Context**: 1 smoke test
 
 ### Test Configuration
 
-Tests use H2 in-memory database with profile `test`:
-- Configured in `src/test/resources/application-test.properties`
-- Automatic schema generation from JPA entities
-- Isolated test data for each test
+**H2 Profile (Default - `test`)**:
+- Configuration: `src/test/resources/application-test.properties`
+- Database: H2 in-memory
+- Schema: Auto-generated from JPA entities
+- Isolation: Each test class gets clean database
+
+**Docker Profile (`docker`)**:
+- Configuration: `src/test/resources/application-docker.properties`
+- Database: Docker MySQL (localhost:3306)
+- Schema: Auto-generated on Docker MySQL
+- Isolation: Shared database, cleaned between test classes
+
+### Running Integration Tests Script
+
+For comprehensive frontend + backend + database testing:
+```powershell
+# Run automated integration test script
+.\test-integration.ps1
+```
+This script tests the complete stack including REST API endpoints.
 
 ## � Report API Endpoints
 
