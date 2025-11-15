@@ -2,6 +2,7 @@ package com.yourapp.expensetracker.expense_api.model;
 
 import java.time.LocalDateTime;
 
+import com.yourapp.expensetracker.expense_api.validation.NoSqlInjection;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +12,9 @@ import jakarta.persistence.Index;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 /**
  * User entity representing an application user.
@@ -33,12 +37,18 @@ public class User {
     /**
      * Username used for login / identification.
      */
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, max = 100, message = "Username must be between 3 and 100 characters")
+    @NoSqlInjection(message = "Username contains invalid characters")
     @Column(nullable = false, unique = true, length = 100)
     private String username;
 
     /**
      * Email address (also unique)
      */
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
+    @Size(max = 255, message = "Email must not exceed 255 characters")
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 

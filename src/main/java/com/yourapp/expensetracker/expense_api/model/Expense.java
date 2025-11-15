@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.yourapp.expensetracker.expense_api.validation.NoSqlInjection;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -21,6 +22,7 @@ public class Expense {
 
     @NotBlank(message = "Description is required")
     @Size(max = 255, message = "Description must not exceed 255 characters")
+    @NoSqlInjection(message = "Description contains invalid characters")
     @Column(nullable = false)
     private String description;
 
@@ -31,6 +33,7 @@ public class Expense {
     private BigDecimal amount;
 
     @NotBlank(message = "Category is required")
+    @NoSqlInjection(message = "Category contains invalid characters")
     @Column(nullable = false)
     private String category;
 

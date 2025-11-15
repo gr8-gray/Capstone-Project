@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -29,6 +31,8 @@ import jakarta.validation.Valid;
 @CrossOrigin(origins = "*") // TODO: Configure proper CORS in production
 public class ExpenseController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExpenseController.class);
+
     private final ExpenseService expenseService;
 
     @Autowired
@@ -42,16 +46,20 @@ public class ExpenseController {
      */
     @PostMapping
     public ResponseEntity<?> createExpense(@Valid @RequestBody Expense newExpense) {
+        logger.info("Creating new expense: amount={}, category={}", newExpense.getAmount(), newExpense.getCategory());
         try {
             // TODO: Get the currently logged-in user (from Spring Security context)
             // SecurityContext context = SecurityContextHolder.getContext();
             // Authentication authentication = context.getAuthentication();
             
             Expense savedExpense = expenseService.createExpense(newExpense);
+            logger.info("Expense created successfully with ID: {}", savedExpense.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(savedExpense);
         } catch (IllegalArgumentException e) {
+            logger.warn("Failed to create expense - validation error: {}", e.getMessage());
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
+            logger.error("Failed to create expense: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to create expense"));
         }
@@ -63,11 +71,14 @@ public class ExpenseController {
      */
     @GetMapping
     public ResponseEntity<List<Expense>> getAllExpenses() {
+        logger.debug("Fetching all expenses");
         try {
             // TODO: Filter by currently logged-in user when User entity is implemented
             List<Expense> expenses = expenseService.getAllExpenses();
+            logger.info("Retrieved {} expenses", expenses.size());
             return ResponseEntity.ok(expenses);
         } catch (Exception e) {
+            logger.error("Failed to fetch expenses: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

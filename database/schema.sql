@@ -106,17 +106,43 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS budgets (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     category VARCHAR(100) NOT NULL,
-    amount DECIMAL(12, 2) NOT NULL,
-    month INT NOT NULL,
-    year INT NOT NULL,
+    limit_amount DECIMAL(12, 2) NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    UNIQUE KEY unique_category_month_year (category, month, year),
-    INDEX idx_month_year (month, year),
-    CONSTRAINT chk_month_valid CHECK (month BETWEEN 1 AND 12),
-    CONSTRAINT chk_year_valid CHECK (year >= 2020),
-    CONSTRAINT chk_budget_positive CHECK (amount > 0)
+    INDEX idx_category (category),
+    INDEX idx_dates (start_date, end_date),
+    CONSTRAINT chk_budget_positive CHECK (limit_amount > 0),
+    CONSTRAINT chk_dates_valid CHECK (end_date >= start_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===================================================================
+-- BUDGET ALERTS TABLE
+-- Tracks budget threshold alerts and notifications
+-- ===================================================================
+CREATE TABLE IF NOT EXISTS budget_alerts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    budget_id BIGINT NOT NULL,
+    alert_level VARCHAR(20) NOT NULL,
+    message TEXT NOT NULL,
+    spent_amount DECIMAL(12, 2) NOT NULL,
+    budget_limit DECIMAL(12, 2) NOT NULL,
+    percentage_used DECIMAL(5, 2) NOT NULL,
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    read_at DATETIME,
+    
+    FOREIGN KEY (budget_id) REFERENCES budgets(id) ON DELETE CASCADE,
+    INDEX idx_budget_id (budget_id),
+    INDEX idx_is_read (is_read),
+    INDEX idx_alert_level (alert_level),
+    INDEX idx_created_at (created_at),
+    
+    CONSTRAINT chk_alert_level CHECK (alert_level IN ('INFO', 'WARNING', 'DANGER', 'CRITICAL')),
+    CONSTRAINT chk_spent_amount CHECK (spent_amount >= 0),
+    CONSTRAINT chk_percentage CHECK (percentage_used >= 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===================================================================

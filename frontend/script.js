@@ -1,11 +1,27 @@
 // ================= SMART EXPENSE TRACKER =================
 // Author: Pukar Adhikari (Frontend Developer / Tester)
 // Modified: Connected to Backend API by Eric Gray
+// Updated: Added authentication integration by Eric Gray
 // Description: Handles all dashboard functionality including
 // adding, editing, deleting expenses, rendering totals, charts,
 // and managing logout behavior.
 
 document.addEventListener("DOMContentLoaded", () => {
+
+  // ===== AUTHENTICATION CHECK =====
+  // Redirect to login if not authenticated
+  requireAuth();
+
+  // Display logged-in user info
+  const user = getUser();
+  const usernameDisplay = document.querySelector('nav a');
+  if (usernameDisplay && user) {
+    // Update the nav link to show username instead of "Logout"
+    const userInfo = document.createElement('span');
+    userInfo.textContent = `Welcome, ${user.username} | `;
+    userInfo.style.marginRight = '5px';
+    usernameDisplay.parentNode.insertBefore(userInfo, usernameDisplay);
+  }
 
   // ===== API CONFIGURATION =====
   const API_BASE_URL = "http://localhost:8080/api/expenses";
@@ -28,57 +44,91 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== API HELPER FUNCTIONS =====
   
-  // Fetch all expenses from backend
+  // Fetch all expenses from backend (authenticated)
   async function fetchExpenses() {
+    console.log('[INFO] Fetching expenses from backend');
     try {
-      const response = await fetch(API_BASE_URL);
-      if (!response.ok) throw new Error("Failed to fetch expenses");
+      const response = await authenticatedFetch(API_BASE_URL);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch expenses: ${response.status} ${response.statusText}`);
+      }
       expenses = await response.json();
+      console.log(`[INFO] Successfully fetched ${expenses.length} expenses`);
       renderTable();
     } catch (error) {
-      console.error("Error fetching expenses:", error);
-      alert("Failed to load expenses from server. Please check if the backend is running.");
+      console.error("[ERROR] Error fetching expenses:", error);
+      if (error.message.includes("Authentication expired")) {
+        // User will be redirected to login by authenticatedFetch
+        return;
+      }
+      if (error.message.includes("Unable to connect")) {
+        alert("Unable to connect to server. Please ensure the backend is running on http://localhost:8080");
+      } else {
+        alert("Failed to load expenses. Please try again later.");
+      }
     }
   }
 
-  // Add new expense to backend
+  // Add new expense to backend (authenticated)
   async function addExpense(expenseData) {
+    console.log('[INFO] Adding new expense:', expenseData);
     try {
-      const response = await fetch(API_BASE_URL, {
+      const response = await authenticatedFetch(API_BASE_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(expenseData)
       });
-      if (!response.ok) throw new Error("Failed to create expense");
-      return await response.json();
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to create expense: ${response.status}`);
+      }
+      
+      const newExpense = await response.json();
+      console.log('[INFO] Expense added successfully with ID:', newExpense.id);
+      return newExpense;
     } catch (error) {
-      console.error("Error adding expense:", error);
+      console.error("[ERROR] Error adding expense:", error);
       throw error;
     }
   }
 
-  // Update expense on backend
+  // Update expense on backend (authenticated)
   async function updateExpense(id, expenseData) {
+    console.log(`[INFO] Updating expense ID ${id}:`, expenseData);
     try {
-      const response = await fetch(`${API_BASE_URL}/${id}`, {
+      const response = await authenticatedFetch(`${API_BASE_URL}/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(expenseData)
       });
-      if (!response.ok) throw new Error("Failed to update expense");
-      return await response.json();
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to update expense: ${response.status}`);
+      }
+      
+      const updatedExpense = await response.json();
+      console.log(`[INFO] Expense ID ${id} updated successfully`);
+      return updatedExpense;
     } catch (error) {
-      console.error("Error updating expense:", error);
+      console.error(`[ERROR] Error updating expense ID ${id}:`, error);
       throw error;
     }
   }
 
-  // Delete expense from backend
+  // Delete expense from backend (authenticated)
   async function deleteExpense(id) {
+    console.log(`[INFO] Deleting expense ID ${id}`);
     try {
-      const response = await fetch(`${API_BASE_URL}/${id}`, {
+      const response = await authenticatedFetch(`${API_BASE_URL}/${id}`, {
         method: "DELETE"
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `Failed to delete expense: ${response.status}`);
+      }
+      
+      console.log(`[INFO] Expense ID ${id} deleted successfully`);
       if (!response.ok) throw new Error("Failed to delete expense");
     } catch (error) {
       console.error("Error deleting expense:", error);
@@ -366,11 +416,8 @@ document.addEventListener("DOMContentLoaded", () => {
       // Clear expenses from memory
       expenses = [];
 
-      // TODO: Call backend logout endpoint when authentication is implemented
-      console.log("Logout — backend authentication to be implemented.");
-
-      // Redirect back to login page
-      window.location.href = "index.html";
+      // Call logout function from auth.js (clears tokens and redirects)
+      logout();
     });
   }
 });

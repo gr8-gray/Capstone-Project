@@ -1,13 +1,20 @@
 package com.yourapp.expensetracker.expense_api.config;
 
+import com.yourapp.expensetracker.expense_api.security.CustomUserDetailsService;
+import com.yourapp.expensetracker.expense_api.security.JwtAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -16,12 +23,18 @@ import java.util.Arrays;
 
 /**
  * Security configuration for the Expense Tracker API
- * Configures authentication, authorization, and CORS settings
+ * Configures authentication, authorization, and CORS settings with JWT
  * @author Eric Gray - Backend Developer
  */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,15 +45,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         // Permit access to authentication endpoints
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Permit access to all API endpoints during development
-                        .requestMatchers("/api/expenses/**",
-                                "/api/budgets/**",
-                                "/api/reports/**").permitAll()
                         // Health check and actuator endpoints
                         .requestMatchers("/actuator/**", "/health").permitAll()
-                        // Everything else can stay protected (or also permitAll for dev)
+                        // Protect all other API endpoints - require authentication
+                        .requestMatchers("/api/expenses/**",
+                                "/api/budgets/**",
+                                "/api/reports/**").authenticated()
+                        // Everything else requires authentication
                         .anyRequest().authenticated()
-                );
+                )
+                // Add JWT authentication filter
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // Configure authentication provider
+                .authenticationProvider(authenticationProvider());
 
         return http.build();
     }
@@ -51,6 +68,25 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12); // Use strength 12 for better security
+    }
+
+    /**
+     * Authentication manager bean
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+
+    /**
+     * Authentication provider using custom UserDetailsService
+     */
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
     }
 
     /**
@@ -69,16 +105,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
-    // TODO: Add AuthenticationManager bean when implementing custom authentication
-    // @Bean
-    // public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-    //     return config.getAuthenticationManager();
-    // }
-
-    // TODO: Add JWT utility beans when implementing JWT authentication
-    // @Bean
-    // public JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint() {
-    //     return new JwtAuthenticationEntryPoint();
-    // }
 }

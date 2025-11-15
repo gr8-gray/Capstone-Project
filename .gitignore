@@ -66,5 +66,27 @@ build/
 # Don't ignore Dockerfile.* (needed by team)
 # Only ignore runtime files
 .env
+.env.local
 docker-compose.override.yml
+mysql-data/
+**/volumes/
+
+### Application Logs ###
+logs/
 *.log
+
+### OS Files ###
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+### Temporary Files ###
+*.swp
+*.swo
+*~
+.directory
