@@ -38,7 +38,7 @@ public class AuthenticationIntegrationTest {
         user.setEmail("test@example.com");
         user.setPasswordHash(passwordEncoder.encode("password123"));
         user.setRole("USER");
-        user.setEnabled(true);
+        user.setActive(true);
 
         // Save user
         User savedUser = userRepository.save(user);

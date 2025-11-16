@@ -1,8 +1,12 @@
 package com.yourapp.expensetracker.expense_api.service;
 
 import com.yourapp.expensetracker.expense_api.dto.UserDTO;
+import com.yourapp.expensetracker.expense_api.exception.DuplicateResourceException;
+import com.yourapp.expensetracker.expense_api.exception.ResourceNotFoundException;
 import com.yourapp.expensetracker.expense_api.model.User;
 import com.yourapp.expensetracker.expense_api.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,10 +19,13 @@ import java.util.stream.Collectors;
 /**
  * Service for user management operations
  * @author Eric Gray - Backend Developer
+ * @author Michael Basye - Database Engineer (Added logging)
  */
 @Service
 @Transactional
 public class UserService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,14 +40,18 @@ public class UserService {
      * Create a new user
      */
     public User createUser(String username, String email, String password, String role) {
+        logger.info("Attempting to create user with username: {}", username);
+        
         // Check if username already exists
         if (userRepository.existsByUsername(username)) {
-            throw new IllegalArgumentException("Username already exists");
+            logger.warn("User creation failed: Username already exists: {}", username);
+            throw new DuplicateResourceException("User", "username", username);
         }
 
         // Check if email already exists
         if (userRepository.existsByEmail(email)) {
-            throw new IllegalArgumentException("Email already exists");
+            logger.warn("User creation failed: Email already exists: {}", email);
+            throw new DuplicateResourceException("User", "email", email);
         }
 
         // Create user with hashed password
@@ -49,9 +60,12 @@ public class UserService {
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setRole(role != null ? role : "USER");
-        user.setEnabled(true);
+        user.setActive(true);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        logger.info("Successfully created user with ID: {} and username: {}", 
+                   savedUser.getId(), savedUser.getUsername());
+        return savedUser;
     }
 
     /**
@@ -90,19 +104,25 @@ public class UserService {
      * Update user
      */
     public User updateUser(Long id, String username, String email, String role) {
+        logger.debug("Updating user with ID: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> {
+                    logger.error("User update failed: User not found with ID: {}", id);
+                    return new ResourceNotFoundException("User", "id", id);
+                });
 
         if (username != null && !username.equals(user.getUsername())) {
             if (userRepository.existsByUsername(username)) {
-                throw new IllegalArgumentException("Username already exists");
+                logger.warn("User update failed: Username already exists: {}", username);
+                throw new DuplicateResourceException("User", "username", username);
             }
             user.setUsername(username);
         }
 
         if (email != null && !email.equals(user.getEmail())) {
             if (userRepository.existsByEmail(email)) {
-                throw new IllegalArgumentException("Email already exists");
+                logger.warn("User update failed: Email already exists: {}", email);
+                throw new DuplicateResourceException("User", "email", email);
             }
             user.setEmail(email);
         }
@@ -111,28 +131,38 @@ public class UserService {
             user.setRole(role);
         }
 
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        logger.info("Successfully updated user with ID: {}", id);
+        return updatedUser;
     }
 
     /**
      * Update password
      */
     public void updatePassword(Long id, String newPassword) {
+        logger.info("Updating password for user ID: {}", id);
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> {
+                    logger.error("Password update failed: User not found with ID: {}", id);
+                    return new ResourceNotFoundException("User", "id", id);
+                });
 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+        logger.info("Successfully updated password for user ID: {}", id);
     }
 
     /**
      * Delete user
      */
     public void deleteUser(Long id) {
+        logger.warn("Attempting to delete user with ID: {}", id);
         if (!userRepository.existsById(id)) {
-            throw new IllegalArgumentException("User not found with id: " + id);
+            logger.error("User deletion failed: User not found with ID: {}", id);
+            throw new ResourceNotFoundException("User", "id", id);
         }
         userRepository.deleteById(id);
+        logger.info("Successfully deleted user with ID: {}", id);
     }
 
     /**
@@ -144,7 +174,7 @@ public class UserService {
                 user.getUsername(),
                 user.getEmail(),
                 user.getRole(),
-                user.isEnabled(),
+                user.isActive(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );

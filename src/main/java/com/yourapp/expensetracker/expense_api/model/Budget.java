@@ -9,6 +9,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -18,7 +19,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "budgets")
+@Table(
+    name = "budgets",
+    indexes = {
+        @Index(name = "idx_category", columnList = "category"),
+        @Index(name = "idx_dates", columnList = "start_date, end_date")
+    }
+)
 public class Budget {
 
     @Id

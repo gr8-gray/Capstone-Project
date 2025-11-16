@@ -19,10 +19,13 @@ public class Category {
     private Long id;
 
     @NotBlank(message = "Category name is required")
-    @Size(max = 80, message = "Category name must not exceed 80 characters")
+    @Size(max = 100, message = "Category name must not exceed 100 characters")
     @NoSqlInjection(message = "Category name contains invalid characters")
-    @Column(nullable = false, unique = true, length = 80)
+    @Column(nullable = false, unique = true, length = 100)
     private String name;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -33,6 +36,11 @@ public class Category {
 
     public Category(String name) {
         this.name = name;
+    }
+
+    public Category(String name, String description) {
+        this.name = name;
+        this.description = description;
     }
 
     @PrePersist
@@ -55,6 +63,14 @@ public class Category {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getCreatedAt() {

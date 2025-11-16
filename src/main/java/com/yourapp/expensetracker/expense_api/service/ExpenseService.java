@@ -1,5 +1,8 @@
 package com.yourapp.expensetracker.expense_api.service;
 
+import com.yourapp.expensetracker.expense_api.exception.ResourceNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,10 +19,13 @@ import java.util.Optional;
  * Service layer for Expense business logic
  * Handles data processing and business rules for expense operations
  * @author Eric Gray - Backend Developer
+ * @author Michael Basye - Database Engineer (Added logging)
  */
 @Service
 @Transactional
 public class ExpenseService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ExpenseService.class);
 
     private final ExpenseRepository expenseRepository;
 
@@ -32,8 +38,12 @@ public class ExpenseService {
      * Create a new expense
      */
     public Expense createExpense(Expense expense) {
+        logger.debug("Creating new expense: category={}, amount={}", 
+                    expense.getCategory(), expense.getAmount());
         validateExpense(expense);
-        return expenseRepository.save(expense);
+        Expense savedExpense = expenseRepository.save(expense);
+        logger.info("Successfully created expense with ID: {}", savedExpense.getId());
+        return savedExpense;
     }
 
     /**
@@ -41,7 +51,10 @@ public class ExpenseService {
      */
     @Transactional(readOnly = true)
     public List<Expense> getAllExpenses() {
-        return expenseRepository.findAll();
+        logger.debug("Fetching all expenses");
+        List<Expense> expenses = expenseRepository.findAll();
+        logger.debug("Retrieved {} expenses", expenses.size());
+        return expenses;
     }
 
     /**
@@ -49,13 +62,19 @@ public class ExpenseService {
      */
     @Transactional(readOnly = true)
     public Optional<Expense> getExpenseById(Long id) {
-        return expenseRepository.findById(id);
+        logger.debug("Fetching expense with ID: {}", id);
+        Optional<Expense> expense = expenseRepository.findById(id);
+        if (expense.isEmpty()) {
+            logger.warn("Expense not found with ID: {}", id);
+        }
+        return expense;
     }
 
     /**
      * Update an existing expense
      */
     public Expense updateExpense(Long id, Expense updatedExpense) {
+        logger.debug("Updating expense with ID: {}", id);
         Optional<Expense> existingExpense = expenseRepository.findById(id);
         if (existingExpense.isPresent()) {
             Expense expense = existingExpense.get();
@@ -64,9 +83,12 @@ public class ExpenseService {
             expense.setCategory(updatedExpense.getCategory());
             expense.setDate(updatedExpense.getDate());
             validateExpense(expense);
-            return expenseRepository.save(expense);
+            Expense saved = expenseRepository.save(expense);
+            logger.info("Successfully updated expense with ID: {}", id);
+            return saved;
         } else {
-            throw new RuntimeException("Expense not found with id: " + id);
+            logger.error("Failed to update expense - ID not found: {}", id);
+            throw new ResourceNotFoundException("Expense", "id", id);
         }
     }
 
@@ -74,10 +96,13 @@ public class ExpenseService {
      * Delete an expense
      */
     public void deleteExpense(Long id) {
+        logger.debug("Attempting to delete expense with ID: {}", id);
         if (expenseRepository.existsById(id)) {
             expenseRepository.deleteById(id);
+            logger.info("Successfully deleted expense with ID: {}", id);
         } else {
-            throw new RuntimeException("Expense not found with id: " + id);
+            logger.error("Failed to delete expense - ID not found: {}", id);
+            throw new ResourceNotFoundException("Expense", "id", id);
         }
     }
 
@@ -86,7 +111,10 @@ public class ExpenseService {
      */
     @Transactional(readOnly = true)
     public List<Expense> getExpensesByCategory(String category) {
-        return expenseRepository.findByCategory(category);
+        logger.debug("Fetching expenses for category: {}", category);
+        List<Expense> expenses = expenseRepository.findByCategory(category);
+        logger.debug("Found {} expenses for category: {}", expenses.size(), category);
+        return expenses;
     }
 
     /**
@@ -154,18 +182,24 @@ public class ExpenseService {
      * Validate expense data
      */
     private void validateExpense(Expense expense) {
+        logger.trace("Validating expense data");
         if (expense.getAmount() != null && expense.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            logger.warn("Validation failed: Amount must be positive, got: {}", expense.getAmount());
             throw new IllegalArgumentException("Amount must be greater than zero");
         }
         if (expense.getDate() != null && expense.getDate().isAfter(LocalDate.now())) {
+            logger.warn("Validation failed: Future date not allowed, got: {}", expense.getDate());
             throw new IllegalArgumentException("Date cannot be in the future");
         }
         if (expense.getDescription() != null && expense.getDescription().trim().isEmpty()) {
+            logger.warn("Validation failed: Description cannot be empty");
             throw new IllegalArgumentException("Description cannot be empty");
         }
         if (expense.getCategory() != null && expense.getCategory().trim().isEmpty()) {
+            logger.warn("Validation failed: Category cannot be empty");
             throw new IllegalArgumentException("Category cannot be empty");
         }
+        logger.trace("Expense validation passed");
     }
 
     // TODO: Add user-specific methods when User entity is implemented

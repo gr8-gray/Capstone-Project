@@ -59,6 +59,20 @@ public class User {
     private String passwordHash;
 
     /**
+     * User's first name.
+     */
+    @Size(max = 50, message = "First name must not exceed 50 characters")
+    @Column(name = "first_name", length = 50)
+    private String firstName;
+
+    /**
+     * User's last name.
+     */
+    @Size(max = 50, message = "Last name must not exceed 50 characters")
+    @Column(name = "last_name", length = 50)
+    private String lastName;
+
+    /**
      * Simple role string, e.g. "USER" or "ADMIN".
      */
     @Column(nullable = false, length = 20)
@@ -67,8 +81,14 @@ public class User {
     /**
      * Whether the account is active.
      */
-    @Column(nullable = false)
-    private boolean enabled = true;
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
+    /**
+     * Timestamp of last login.
+     */
+    @Column(name = "last_login")
+    private LocalDateTime lastLogin;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -88,6 +108,14 @@ public class User {
         if (role != null) {
             this.role = role;
         }
+    }
+
+    public User(String username, String email, String passwordHash, String firstName, String lastName) {
+        this.username = username;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     // --- Lifecycle callbacks ---
@@ -148,12 +176,36 @@ public class User {
         }
     }
 
-    public boolean isEnabled() {
-        return enabled;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        this.isActive = active;
+    }
+
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -180,8 +232,11 @@ public class User {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
                 ", role='" + role + '\'' +
-                ", enabled=" + enabled +
+                ", isActive=" + isActive +
+                ", lastLogin=" + lastLogin +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

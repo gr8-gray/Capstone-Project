@@ -1,5 +1,7 @@
 package com.yourapp.expensetracker.expense_api.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -9,9 +11,12 @@ import java.util.List;
  * Service for managing expense categories
  * Provides predefined categories and category validation
  * @author Eric Gray - Backend Developer
+ * @author Michael Basye - Database Engineer (Added logging)
  */
 @Service
 public class CategoryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(CategoryService.class);
 
     // Predefined expense categories
     private static final List<String> DEFAULT_CATEGORIES = Arrays.asList(
@@ -37,6 +42,7 @@ public class CategoryService {
      * Get all predefined categories
      */
     public List<String> getDefaultCategories() {
+        logger.debug("Fetching default categories list");
         return DEFAULT_CATEGORIES;
     }
 
@@ -54,7 +60,10 @@ public class CategoryService {
      * Get category suggestions based on description
      */
     public String suggestCategory(String description) {
+        logger.debug("Suggesting category for description: {}", 
+                    description != null ? description.substring(0, Math.min(description.length(), 50)) : "null");
         if (description == null || description.trim().isEmpty()) {
+            logger.debug("Empty description, returning 'Other' category");
             return "Other";
         }
         

@@ -21,6 +21,7 @@ import java.util.Map;
  * Global exception handler for the Expense Tracker API
  * Provides consistent error responses across all controllers
  * @author Eric Gray - Backend Developer
+ * @author Michael Basye - Database Engineer (Enhanced error handling and logging)
  */
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -93,6 +94,44 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Handle ResourceNotFoundException
+     */
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+            ResourceNotFoundException ex, WebRequest request) {
+        
+        logger.warn("Resource not found: {}", ex.getMessage());
+        
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.NOT_FOUND.value());
+        errorResponse.put("error", "Not Found");
+        errorResponse.put("message", ex.getMessage());
+        errorResponse.put("path", request.getDescription(false));
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * Handle DuplicateResourceException
+     */
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity<Map<String, Object>> handleDuplicateResourceException(
+            DuplicateResourceException ex, WebRequest request) {
+        
+        logger.warn("Duplicate resource: {}", ex.getMessage());
+        
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("timestamp", LocalDateTime.now());
+        errorResponse.put("status", HttpStatus.CONFLICT.value());
+        errorResponse.put("error", "Conflict");
+        errorResponse.put("message", ex.getMessage());
+        errorResponse.put("path", request.getDescription(false));
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    /**
      * Handle runtime exceptions (like entity not found)
      */
     @ExceptionHandler(RuntimeException.class)
@@ -127,7 +166,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleGenericException(
             Exception ex, WebRequest request) {
         
-        logger.error("Unexpected exception: {}", ex.getMessage(), ex);
+        logger.error("Unexpected exception: {} at path: {}", ex.getMessage(), 
+                    request.getDescription(false), ex);
         
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("timestamp", LocalDateTime.now());
@@ -135,10 +175,6 @@ public class GlobalExceptionHandler {
         errorResponse.put("error", "Internal Server Error");
         errorResponse.put("message", "An unexpected error occurred");
         errorResponse.put("path", request.getDescription(false));
-
-        // Log the full exception for debugging (in production, use proper logging)
-        System.err.println("Unexpected error: " + ex.getMessage());
-        ex.printStackTrace();
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }

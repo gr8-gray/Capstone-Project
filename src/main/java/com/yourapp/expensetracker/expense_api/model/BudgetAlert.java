@@ -9,7 +9,15 @@ import java.time.LocalDateTime;
  * @author Eric Gray - Backend Developer
  */
 @Entity
-@Table(name = "budget_alerts")
+@Table(
+    name = "budget_alerts",
+    indexes = {
+        @Index(name = "idx_budget_id", columnList = "budget_id"),
+        @Index(name = "idx_is_read", columnList = "is_read"),
+        @Index(name = "idx_alert_level", columnList = "alertLevel"),
+        @Index(name = "idx_created_at", columnList = "created_at")
+    }
+)
 public class BudgetAlert {
 
     @Id

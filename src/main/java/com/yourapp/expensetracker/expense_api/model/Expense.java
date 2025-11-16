@@ -13,7 +13,18 @@ import jakarta.validation.constraints.*;
  * @author Eric Gray - Backend Developer
  */
 @Entity
-@Table(name = "expenses")
+@Table(
+    name = "expenses",
+    indexes = {
+        @Index(name = "idx_category", columnList = "category"),
+        @Index(name = "idx_date", columnList = "date"),
+        @Index(name = "idx_created_at", columnList = "created_at"),
+        @Index(name = "idx_updated_at", columnList = "updated_at"),
+        @Index(name = "idx_category_date", columnList = "category, date"),
+        @Index(name = "idx_amount", columnList = "amount"),
+        @Index(name = "idx_description", columnList = "description")
+    }
+)
 public class Expense {
 
     @Id
