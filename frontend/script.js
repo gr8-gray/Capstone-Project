@@ -13,6 +13,15 @@
  * ================================================================
  */
 
+(function securePageLoad() {
+  const token = localStorage.getItem("token");
+
+  // If no token, redirect before anything renders
+  if (!token || token.length < 10) {
+    console.warn("[SECURITY] No token found — redirecting to login.");
+    window.location.replace("login.html");
+  }
+})();
 
 document.addEventListener("DOMContentLoaded", () => {
 
