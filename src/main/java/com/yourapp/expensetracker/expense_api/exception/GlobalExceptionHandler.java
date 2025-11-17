@@ -1,6 +1,5 @@
 package com.yourapp.expensetracker.expense_api.exception;
 
-import com.yourapp.expensetracker.expense_api.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

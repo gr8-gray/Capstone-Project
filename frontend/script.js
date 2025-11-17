@@ -1,158 +1,98 @@
-// ================= SMART EXPENSE TRACKER =================
-// Author: Pukar Adhikari (Frontend Developer / Tester)
-// Modified: Connected to Backend API by Eric Gray
-// Updated: Added authentication integration by Eric Gray
-// Description: Handles all dashboard functionality including
-// adding, editing, deleting expenses, rendering totals, charts,
-// and managing logout behavior.
+/* 
+ * ================================================================
+ * SMART EXPENSE TRACKER – Dashboard Logic
+ * Author: Pukar Adhikari (Frontend Developer / Tester)
+ * Date Modified: November 2025
+ * Connected to the Backend API by Eric Gray
+ *
+ * Description:
+ * Controls all dashboard behavior: fetching expenses, updating UI,
+ * calculating totals, editing entries, deleting records, rendering
+ * charts, and displaying user info. Includes token-waiting logic
+ * to prevent double-login issues.
+ * ================================================================
+ */
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ===== AUTHENTICATION CHECK =====
-  // Redirect to login if not authenticated
-  requireAuth();
+  console.log("[INFO] Waiting for token before initializing dashboard...");
 
-  // Display logged-in user info
-  const user = getUser();
-  const usernameDisplay = document.querySelector('nav a');
-  if (usernameDisplay && user) {
-    // Update the nav link to show username instead of "Logout"
-    const userInfo = document.createElement('span');
-    userInfo.textContent = `Welcome, ${user.username} | `;
-    userInfo.style.marginRight = '5px';
-    usernameDisplay.parentNode.insertBefore(userInfo, usernameDisplay);
-  }
-
-  // ===== API CONFIGURATION =====
+  // ===== API BASE =====
   const API_BASE_URL = "http://localhost:8080/api/expenses";
 
-  // ===== DOM ELEMENT REFERENCES =====
-  const form = document.getElementById("expense-form");         // Add Expense form
-  const nameEl = document.getElementById("expense-name");       // Expense name input
-  const catEl = document.getElementById("expense-category");    // Category dropdown
-  const amtEl = document.getElementById("expense-amount");      // Amount input
-  const dateEl = document.getElementById("expense-date");       // Date input
-  const tbody = document.getElementById("table-body");          // Table body for listing expenses
-  const totalCell = document.getElementById("total-cell");      // Total amount cell
+  // ===== DATE FIXERS =====
+  function toLocalDate(dateStr) {
+    const [y, m, d] = dateStr.split("-").map(Number);
+    return new Date(y, m - 1, d).toISOString().split("T")[0];
+  }
 
-  // Store expenses in memory (loaded from backend)
+  function toLocale(dateStr) {
+    const fixed = toLocalDate(dateStr);
+    const [y, m, d] = fixed.split("-");
+    return `${m}/${d}/${y}`;
+  }
+
+  // ===== DOM ELEMENTS =====
+  const form = document.getElementById("expense-form");
+  const nameEl = document.getElementById("expense-name");
+  const catEl = document.getElementById("expense-category");
+  const amtEl = document.getElementById("expense-amount");
+  const dateEl = document.getElementById("expense-date");
+  const tbody = document.getElementById("table-body");
+  const totalCell = document.getElementById("total-cell");
+
   let expenses = [];
 
-  // Helper functions for formatting currency and date
-  const fmtMoney = (n) => `$${Number(n).toFixed(2)}`;
-  const toLocale = (iso) => { const [year, month, day] = iso.split("-");
-  return `${month}/${day}/${year}`;
-};
-
-  // ===== API HELPER FUNCTIONS =====
-  
-  // Fetch all expenses from backend (authenticated)
+  // ===== API CALLS =====
   async function fetchExpenses() {
-    console.log('[INFO] Fetching expenses from backend');
+    console.log("[INFO] Fetching expenses...");
     try {
-      const response = await authenticatedFetch(API_BASE_URL);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch expenses: ${response.status} ${response.statusText}`);
-      }
-      expenses = await response.json();
-      console.log(`[INFO] Successfully fetched ${expenses.length} expenses`);
+      const res = await authenticatedFetch(API_BASE_URL);
+      expenses = await res.json();
       renderTable();
-    } catch (error) {
-      console.error("[ERROR] Error fetching expenses:", error);
-      if (error.message.includes("Authentication expired")) {
-        // User will be redirected to login by authenticatedFetch
-        return;
-      }
-      if (error.message.includes("Unable to connect")) {
-        alert("Unable to connect to server. Please ensure the backend is running on http://localhost:8080");
-      } else {
-        alert("Failed to load expenses. Please try again later.");
-      }
+    } catch (err) {
+      console.error(err);
+      alert("Could not load expenses from server.");
     }
   }
 
-  // Add new expense to backend (authenticated)
-  async function addExpense(expenseData) {
-    console.log('[INFO] Adding new expense:', expenseData);
-    try {
-      const response = await authenticatedFetch(API_BASE_URL, {
-        method: "POST",
-        body: JSON.stringify(expenseData)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to create expense: ${response.status}`);
-      }
-      
-      const newExpense = await response.json();
-      console.log('[INFO] Expense added successfully with ID:', newExpense.id);
-      return newExpense;
-    } catch (error) {
-      console.error("[ERROR] Error adding expense:", error);
-      throw error;
-    }
+  async function addExpense(expense) {
+    const res = await authenticatedFetch(API_BASE_URL, {
+      method: "POST",
+      body: JSON.stringify(expense),
+    });
+    return await res.json();
   }
 
-  // Update expense on backend (authenticated)
-  async function updateExpense(id, expenseData) {
-    console.log(`[INFO] Updating expense ID ${id}:`, expenseData);
-    try {
-      const response = await authenticatedFetch(`${API_BASE_URL}/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(expenseData)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to update expense: ${response.status}`);
-      }
-      
-      const updatedExpense = await response.json();
-      console.log(`[INFO] Expense ID ${id} updated successfully`);
-      return updatedExpense;
-    } catch (error) {
-      console.error(`[ERROR] Error updating expense ID ${id}:`, error);
-      throw error;
-    }
+  async function updateExpense(id, data) {
+    const res = await authenticatedFetch(`${API_BASE_URL}/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    return await res.json();
   }
 
-  // Delete expense from backend (authenticated)
   async function deleteExpense(id) {
-    console.log(`[INFO] Deleting expense ID ${id}`);
-    try {
-      const response = await authenticatedFetch(`${API_BASE_URL}/${id}`, {
-        method: "DELETE"
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Failed to delete expense: ${response.status}`);
-      }
-      
-      console.log(`[INFO] Expense ID ${id} deleted successfully`);
-      if (!response.ok) throw new Error("Failed to delete expense");
-    } catch (error) {
-      console.error("Error deleting expense:", error);
-      throw error;
-    }
+    await authenticatedFetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
   }
 
-  // ===== RECALCULATE AND DISPLAY TOTAL =====
+  // ===== TOTAL =====
   function recalcTotal() {
-    const sum = expenses.reduce((acc, e) => acc + Number(e.amount), 0);
-    totalCell.innerHTML = `<strong>${fmtMoney(sum)}</strong>`;
+    let sum = expenses.reduce((s, e) => s + Number(e.amount), 0);
+    totalCell.innerHTML = `<strong>$${sum.toFixed(2)}</strong>`;
   }
 
-  // ===== RENDER TABLE CONTENT =====
+  // ===== RENDER TABLE =====
   function renderTable() {
     tbody.innerHTML = "";
+
     expenses.forEach((exp, index) => {
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${exp.description}</td>
         <td>${exp.category}</td>
-        <td>${fmtMoney(exp.amount)}</td>
+        <td>$${Number(exp.amount).toFixed(2)}</td>
         <td>${toLocale(exp.date)}</td>
         <td>
           <button class="edit-btn" data-id="${exp.id}" data-index="${index}">✏️</button>
@@ -161,95 +101,75 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
       tbody.appendChild(row);
     });
-    recalcTotal(); // Update total after rendering
+
+    recalcTotal();
   }
 
-  // ===== ADD NEW EXPENSE =====
+  // ===== ADD EXPENSE =====
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    // Get form values
-    const description = nameEl.value.trim();
-    const category = catEl.value;
-    const amount = Number(amtEl.value);
-    const date = dateEl.value;
+    const expense = {
+      description: nameEl.value.trim(),
+      category: catEl.value,
+      amount: Number(amtEl.value),
+      date: dateEl.value,
+    };
 
-    // Validate all fields
-    if (!description || !category || !date || amount <= 0) {
-      alert("Please fill out all fields correctly.");
+    if (!expense.description || !expense.category || !expense.date || expense.amount <= 0) {
+      alert("Fill all fields correctly.");
       return;
     }
 
-    // Create expense object matching backend model
-    const expenseData = {
-      description,
-      category,
-      amount,
-      date
-    };
-
     try {
-      // Add new expense via API
-      await addExpense(expenseData);
-      await fetchExpenses(); // Reload expenses from backend
-      form.reset(); // Clear form inputs
-      alert("Expense added successfully!");
-    } catch (error) {
-      alert("Failed to add expense. Please try again.");
+      await addExpense(expense);
+      await fetchExpenses();
+      form.reset();
+    } catch {
+      alert("Failed to add expense.");
     }
   });
 
-  // ===== HANDLE EDIT AND DELETE BUTTONS =====
+  // ===== EDIT / DELETE =====
   tbody.addEventListener("click", async (e) => {
-    const target = e.target;
-    const index = target.dataset.index;
-    const expenseId = target.dataset.id;
+    const btn = e.target;
+    const id = btn.dataset.id;
+    const idx = btn.dataset.index;
 
-    // --- DELETE EXPENSE ---
-    if (target.classList.contains("delete-btn")) {
+    // DELETE
+    if (btn.classList.contains("delete-btn")) {
       if (confirm("Delete this expense?")) {
-        try {
-          await deleteExpense(expenseId);
-          await fetchExpenses(); // Reload expenses from backend
-          alert("Expense deleted successfully!");
-        } catch (error) {
-          alert("Failed to delete expense. Please try again.");
-        }
+        await deleteExpense(id);
+        await fetchExpenses();
       }
+      return;
     }
 
-    // --- EDIT EXPENSE ---
-    if (target.classList.contains("edit-btn")) {
-      const row = target.closest("tr");
-      const exp = expenses[index];
+    // EDIT
+    if (btn.classList.contains("edit-btn")) {
+      const row = btn.closest("tr");
+      const exp = expenses[idx];
 
-      // Create editable input fields
       const nameInput = document.createElement("input");
-      nameInput.type = "text";
       nameInput.value = exp.description;
 
-      // Dropdown for category options
       const categorySelect = document.createElement("select");
-      const categories = ["Food", "Transport", "Utilities", "Entertainment", "Health", "Other"];
-      categories.forEach((cat) => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        if (cat === exp.category) option.selected = true;
-        categorySelect.appendChild(option);
+      ["Food", "Transport", "Utilities", "Entertainment", "Health", "Other"].forEach((c) => {
+        const opt = document.createElement("option");
+        opt.value = opt.textContent = c;
+        if (c === exp.category) opt.selected = true;
+        categorySelect.appendChild(opt);
       });
 
       const amountInput = document.createElement("input");
       amountInput.type = "number";
       amountInput.step = "0.01";
-      amountInput.min = "0";
       amountInput.value = exp.amount;
 
       const dateInput = document.createElement("input");
       dateInput.type = "date";
-      dateInput.value = exp.date;
+      dateInput.value = toLocalDate(exp.date);
 
-      // Replace table cells with editable inputs
       row.children[0].innerHTML = "";
       row.children[0].appendChild(nameInput);
       row.children[1].innerHTML = "";
@@ -259,167 +179,121 @@ document.addEventListener("DOMContentLoaded", () => {
       row.children[3].innerHTML = "";
       row.children[3].appendChild(dateInput);
 
-      // Change edit button to a save button (💾)
-      target.textContent = "💾";
-      target.style.background = "#4CAF50";
-      target.style.color = "white";
+      btn.textContent = "💾";
+      btn.style.background = "#4CAF50";
+      btn.style.color = "white";
 
-      // Save updated expense when clicked again
-      target.onclick = async () => {
-        const updatedExpense = {
+      btn.onclick = async () => {
+        const updated = {
           description: nameInput.value.trim(),
           category: categorySelect.value,
           amount: parseFloat(amountInput.value),
           date: dateInput.value,
         };
 
-        // Validate before saving
-        if (
-          !updatedExpense.description ||
-          !updatedExpense.category ||
-          isNaN(updatedExpense.amount) ||
-          updatedExpense.amount <= 0 ||
-          !updatedExpense.date
-        ) {
-          alert("Please enter valid values before saving.");
+        if (!updated.description || !updated.category || updated.amount <= 0 || !updated.date) {
+          alert("Enter valid values.");
           return;
         }
 
-        try {
-          // Update expense via API
-          await updateExpense(expenseId, updatedExpense);
-          await fetchExpenses(); // Reload expenses from backend
-          alert("Expense updated successfully!");
-        } catch (error) {
-          alert("Failed to update expense. Please try again.");
-        }
+        await updateExpense(id, updated);
+        await fetchExpenses();
       };
     }
   });
 
-  // ===== INITIALIZE TABLE ON PAGE LOAD =====
-  fetchExpenses(); // Load expenses from backend on page load
+  // ===== WAIT FOR TOKEN, THEN AUTH + LOAD =====
+  console.log("[INFO] Waiting for token before loading expenses...");
 
-  // ===== CHARTS SECTION =====
-  const viewBtn = document.getElementById("viewReportBtn");   // Button to toggle charts
-  const chartSection = document.getElementById("chartSection"); // Chart container
+  let attempts = 0;
+  const waitForToken = setInterval(() => {
+    const token = localStorage.getItem("token");
+    console.log("[DEBUG] Token check attempt", attempts, "value:", token);
+
+    if (token && token.length > 10) {
+      clearInterval(waitForToken);
+
+      console.log("[INFO] Token detected — initializing dashboard.");
+
+      // NOW SAFE TO RUN AUTH CHECK
+      requireAuth();
+
+      // NOW RENDER USER HEADER
+      const user = getUser();
+      const nav = document.querySelector("nav");
+      if (nav && user) {
+        const span = document.createElement("span");
+        span.textContent = `Welcome, ${user.username}`;
+        span.style.marginRight = "15px";
+        span.style.fontWeight = "bold";
+        span.style.color = "white";
+        nav.prepend(span);
+      }
+
+      // NOW LOAD EXPENSES
+      fetchExpenses();
+    }
+
+    attempts++;
+    if (attempts > 30) {  // 3 seconds max
+      clearInterval(waitForToken);
+      alert("Could not load expenses from server.");
+    }
+  }, 100);
+
+  // ===== CHARTS =====
+  const viewBtn = document.getElementById("viewReportBtn");
+  const chartSection = document.getElementById("chartSection");
   let chartsVisible = false;
 
-  // Toggle chart section visibility
   viewBtn.addEventListener("click", () => {
     chartsVisible = !chartsVisible;
     chartSection.style.display = chartsVisible ? "block" : "none";
     viewBtn.textContent = chartsVisible ? "📉 Hide Reports" : "📊 View Reports";
-
-    if (chartsVisible) renderCharts(); // Render charts when section is shown
-
-    // Handle month filter changes
-    const monthFilter = document.getElementById("monthFilter");
-    monthFilter.addEventListener("change", () => {
-      const selectedMonth = monthFilter.value;
-      renderCharts(selectedMonth);
-    });
+    if (chartsVisible) renderCharts();
   });
 
-  // ===== RENDER CHARTS FUNCTION =====
-  function renderCharts(selectedMonth = "all") {
-    // Use expenses from backend (already loaded in memory)
-    const savedExpenses = expenses;
+  function renderCharts() {
+    const catTotals = {};
+    const monthTotals = {};
 
-    // --- Filter expenses by selected month ---
-    const filteredExpenses = savedExpenses.filter((exp) => {
-      if (selectedMonth === "all") return true;
-      const expMonth = new Date(exp.date).toLocaleString("default", { month: "short" });
-      return expMonth === selectedMonth;
+    expenses.forEach((exp) => {
+      const fixed = toLocalDate(exp.date);
+      const month = new Date(fixed).toLocaleString("default", { month: "short" });
+
+      catTotals[exp.category] = (catTotals[exp.category] || 0) + Number(exp.amount);
+      monthTotals[month] = (monthTotals[month] || 0) + Number(exp.amount);
     });
 
-    // --- Aggregate by category for Pie Chart ---
-    const categoryTotals = {};
-    filteredExpenses.forEach((exp) => {
-      categoryTotals[exp.category] = (categoryTotals[exp.category] || 0) + Number(exp.amount);
-    });
+    const categories = Object.keys(catTotals);
+    const categoryAmounts = Object.values(catTotals);
 
-    const categories = Object.keys(categoryTotals);
-    const categoryAmounts = Object.values(categoryTotals);
+    const months = Object.keys(monthTotals);
+    const monthlyAmounts = Object.values(monthTotals);
 
-    // --- Aggregate by month for Bar Chart ---
-    const monthlyTotals = {};
-    savedExpenses.forEach((exp) => {
-      const month = new Date(exp.date).toLocaleString("default", { month: "short" });
-      monthlyTotals[month] = (monthlyTotals[month] || 0) + Number(exp.amount);
-    });
-
-    const months = Object.keys(monthlyTotals);
-    const monthlyAmounts = Object.values(monthlyTotals);
-
-    // Destroy previous charts (if they exist) to avoid overlapping
     if (window.categoryChartObj) window.categoryChartObj.destroy();
     if (window.monthlyChartObj) window.monthlyChartObj.destroy();
 
-    // --- PIE CHART: Category Breakdown ---
-    const ctx1 = document.getElementById("categoryChart").getContext("2d");
-    window.categoryChartObj = new Chart(ctx1, {
+    window.categoryChartObj = new Chart(document.getElementById("categoryChart"), {
       type: "pie",
       data: {
-        labels: categories.length ? categories : ["No Data"],
-        datasets: [
-          {
-            data: categoryAmounts.length ? categoryAmounts : [1],
-            backgroundColor: ["#007acc", "#00bcd4", "#ffcc00", "#ff7043", "#4caf50", "#9c27b0"],
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: {
-            display: true,
-            text:
-              selectedMonth === "all"
-                ? "All Expenses by Category"
-                : `Expenses in ${selectedMonth} by Category`,
-          },
-          legend: { position: "bottom" },
-        },
+        labels: categories,
+        datasets: [{ data: categoryAmounts }],
       },
     });
 
-    // --- BAR CHART: Monthly Trend ---
-    const ctx2 = document.getElementById("monthlyChart").getContext("2d");
-    window.monthlyChartObj = new Chart(ctx2, {
+    window.monthlyChartObj = new Chart(document.getElementById("monthlyChart"), {
       type: "bar",
       data: {
         labels: months,
-        datasets: [
-          {
-            label: "Spending ($)",
-            data: monthlyAmounts,
-            backgroundColor: "#007acc",
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        scales: { y: { beginAtZero: true } },
-        plugins: { title: { display: true, text: "Monthly Spending Trend" } },
+        datasets: [{ label: "Total", data: monthlyAmounts }],
       },
     });
   }
 
-  // ===== LOGOUT HANDLER =====
-  const logoutBtn = document.getElementById("logoutBtn");
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-
-      const confirmLogout = confirm("Are you sure you want to log out?");
-      if (!confirmLogout) return;
-
-      // Clear expenses from memory
-      expenses = [];
-
-      // Call logout function from auth.js (clears tokens and redirects)
-      logout();
-    });
-  }
+  // ===== LOGOUT =====
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    clearAuthData();
+    window.location.href = "login.html";
+  });
 });

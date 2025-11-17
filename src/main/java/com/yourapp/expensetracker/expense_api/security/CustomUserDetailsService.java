@@ -19,6 +19,7 @@ import java.util.List;
  * Loads user details from database for authentication
  * @author Eric Gray - Backend Developer
  */
+
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
@@ -32,40 +33,37 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
-        // Find user by username or email
+
         User user = userRepository.findByUsername(usernameOrEmail)
                 .orElseGet(() -> userRepository.findByEmail(usernameOrEmail)
-                        .orElseThrow(() -> new UsernameNotFoundException(
-                                "User not found with username or email: " + usernameOrEmail)));
+                        .orElseThrow(() ->
+                                new UsernameNotFoundException("User not found with username or email: " + usernameOrEmail)
+                        ));
 
         return buildUserDetails(user);
     }
 
-    /**
-     * Load user by ID (useful for JWT authentication)
-     */
     @Transactional(readOnly = true)
     public UserDetails loadUserById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found with id: " + userId)
+                );
 
         return buildUserDetails(user);
     }
 
-    /**
-     * Build Spring Security UserDetails from User entity
-     */
     private UserDetails buildUserDetails(User user) {
-        List<GrantedAuthority> authorities = Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + user.getRole())
-        );
+
+        List<GrantedAuthority> authorities =
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
 
         return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())
-                .password(user.getPasswordHash())
-                .authorities(authorities)
+                .username(user.getUsername())           // always consistent
+                .password(user.getPasswordHash())       // hashed password
+                .authorities(authorities)               // consistent for all paths
                 .accountExpired(false)
-                .accountLocked(!user.isActive())
+                .accountLocked(false)                  // do NOT flip logic
                 .credentialsExpired(false)
                 .disabled(!user.isActive())
                 .build();

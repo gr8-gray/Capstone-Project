@@ -16,6 +16,8 @@ public class RegisterRequest {
     @NoSqlInjection(message = "Username contains invalid characters")
     private String username;
 
+    private String fullName;
+
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
     @Size(max = 255, message = "Email must not exceed 255 characters")
@@ -28,10 +30,11 @@ public class RegisterRequest {
     public RegisterRequest() {
     }
 
-    public RegisterRequest(String username, String email, String password) {
+    public RegisterRequest(String username, String email, String password, String fullName) {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.fullName = fullName;
     }
 
     public String getUsername() {
@@ -56,5 +59,13 @@ public class RegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getfullName() {
+        return fullName;
+    }
+
+    public void setfullName(String fullName) {
+        this.fullName = fullName;
     }
 }
