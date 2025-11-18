@@ -1,9 +1,9 @@
-/* 
+/*
  * ================================================================
  * ================= AUTHENTICATION MODULE =================
  * Author: Eric Gray - Backend Developer
  * Description: Handles authentication, token management, and API calls
- * 
+ *
  * Modified by Pukar Adhikari
  *
  * Description:
@@ -171,22 +171,40 @@ async function register(username, email, password, fullName) {
       body: JSON.stringify({ username, email, password, fullName }),
     });
 
-    const data = await response.json();
+    // Safely parse JSON (in case backend returns empty body)
+    let data = {};
+    try {
+      const text = await response.text();
+      data = text ? JSON.parse(text) : {};
+    } catch (e) {
+      data = {};
+    }
 
     if (!response.ok) {
-      const msg = data.error || "Registration failed";
-      log(LOG_LEVELS.WARN, "Registration failed:", msg);
+      const msg =
+        data.message || // <- what your Spring backend most likely sends
+        data.error ||
+        data.details ||
+        `Registration failed (${response.status})`;
+
+      log(LOG_LEVELS.WARN, "Registration failed:", msg, data);
       throw new Error(msg);
     }
 
     log(LOG_LEVELS.INFO, "User registered successfully");
     return data;
   } catch (err) {
-    if (err.name === "TypeError" && err.message.includes("fetch")) {
+    // True network/backend-down cases
+    if (
+      err.name === "TypeError" &&
+      (err.message.includes("fetch") || err.message.includes("NetworkError"))
+    ) {
       throw new Error(
         "Unable to connect to server. Please check if the backend is running."
       );
     }
+
+    // Propagate the real backend error message (e.g. "User already exists...")
     throw err;
   }
 }
