@@ -1,10 +1,5 @@
 package com.yourapp.expensetracker.expense_api.service;
 
-import com.yourapp.expensetracker.expense_api.dto.AuthResponse;
-import com.yourapp.expensetracker.expense_api.dto.LoginRequest;
-import com.yourapp.expensetracker.expense_api.dto.RegisterRequest;
-import com.yourapp.expensetracker.expense_api.model.User;
-import com.yourapp.expensetracker.expense_api.security.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +11,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.yourapp.expensetracker.expense_api.dto.AuthResponse;
+import com.yourapp.expensetracker.expense_api.dto.LoginRequest;
+import com.yourapp.expensetracker.expense_api.dto.RegisterRequest;
+import com.yourapp.expensetracker.expense_api.model.User;
+import com.yourapp.expensetracker.expense_api.security.JwtTokenProvider;
 
 /**
  * Service for authentication operations (login, register)

@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   redirectIfAuthenticated();
 
   const registerForm = document.getElementById("register-form");
-  const nameInput = document.getElementById("name");
+  const nameInput = document.getElementById("full-name");
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
   const confirmPasswordInput = document.getElementById("confirm-password");
@@ -46,7 +46,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (username.length < 3) {
-      alert("Username must be at least 3 characters long");
+      alert("Usernawme must be at least 3 characters long");
       return;
     }
 

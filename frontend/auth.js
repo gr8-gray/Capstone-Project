@@ -171,18 +171,12 @@ async function register(username, email, password, fullName) {
       body: JSON.stringify({ username, email, password, fullName }),
     });
 
-    // Safely parse JSON (in case backend returns empty body)
-    let data = {};
-    try {
-      const text = await response.text();
-      data = text ? JSON.parse(text) : {};
-    } catch (e) {
-      data = {};
-    }
+    // Safe JSON parse
+    let data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
       const msg =
-        data.message || // <- what your Spring backend most likely sends
+        data.message ||
         data.error ||
         data.details ||
         `Registration failed (${response.status})`;
@@ -191,21 +185,18 @@ async function register(username, email, password, fullName) {
       throw new Error(msg);
     }
 
+    // This will now only run when registration TRULY succeeded
     log(LOG_LEVELS.INFO, "User registered successfully");
     return data;
   } catch (err) {
-    // True network/backend-down cases
-    if (
-      err.name === "TypeError" &&
-      (err.message.includes("fetch") || err.message.includes("NetworkError"))
-    ) {
+    // Handle offline/server-down
+    if (err.name === "TypeError") {
       throw new Error(
-        "Unable to connect to server. Please check if the backend is running."
+        "Unable to connect to the server. Please ensure backend is running."
       );
     }
 
-    // Propagate the real backend error message (e.g. "User already exists...")
-    throw err;
+    throw err; // propagate real backend errors
   }
 }
 
