@@ -32,12 +32,14 @@ A full-stack web application for personal expense management with JWT authentica
 ## ✨ Features
 
 ### 🔐 Security & Authentication
+
 - **JWT Authentication** - Secure token-based authentication with 24-hour expiration
 - **BCrypt Password Hashing** - Industry-standard password protection (strength 12)
 - **SQL Injection Prevention** - Multi-layer defense with custom validators
 - **Global Error Handling** - User-friendly error messages without exposing sensitive data
 
 ### 💸 Expense Management
+
 - **Complete CRUD Operations** - Create, read, update, delete expenses
 - **Smart Categorization** - Default and custom categories
 - **Date Range Filtering** - Filter expenses by date
@@ -45,6 +47,7 @@ A full-stack web application for personal expense management with JWT authentica
 - **17 API Endpoints** - Comprehensive expense management
 
 ### 📊 Budget Tracking & Alerts
+
 - **Automated Budget Monitoring** - Real-time budget tracking
 - **4-Level Alert System**:
   - 🟢 INFO (50% spent)
@@ -56,18 +59,21 @@ A full-stack web application for personal expense management with JWT authentica
 - **9 REST Endpoints** - Complete alert management
 
 ### 📈 Reporting & Analytics
+
 - Monthly expense summaries
 - Category-wise spending analysis
 - Spending trends over time
 - Budget vs. actual comparisons
 
 ### 🐋 Docker Integration
+
 - **MySQL 8.0 in Docker** - Consistent development environment
 - **Data Persistence** - All data persists across restarts
 - **Automated Scripts** - One-command startup/shutdown
 - **Health Monitoring** - Container health checks
 
 ### 🔍 Developer Experience
+
 - **Comprehensive Logging** - SLF4J with rotating file appenders
 - **Complete Documentation** - 8 comprehensive guides (1000+ pages)
 - **Integration Tests** - 40+ test methods
@@ -85,7 +91,7 @@ A full-stack web application for personal expense management with JWT authentica
 ✅ **SQL Injection Prevention** - Custom validators and parameterized queries  
 ✅ **Error Handling & Logging** - Enterprise-grade error handling  
 ✅ **Category Management** - 8 new CRUD endpoints for categories  
-✅ **Frontend Integration** - Complete authentication module  
+✅ **Frontend Integration** - Complete authentication module
 
 ### Statistics
 
@@ -109,6 +115,7 @@ cd SmartExpenseTrackingApp
 ```
 
 **That's it!** The script will:
+
 1. ✅ Check Docker status
 2. ✅ Start MySQL container
 3. ✅ Wait for database to be ready
@@ -132,6 +139,7 @@ cd SmartExpenseTrackingApp
 ## 🛠️ Technology Stack
 
 ### Backend
+
 - **Java 17** - Modern LTS version
 - **Spring Boot 3.2.0** - Application framework
 - **Spring Security** - Authentication & authorization
@@ -141,11 +149,13 @@ cd SmartExpenseTrackingApp
 - **SLF4J + Logback** - Logging framework
 
 ### Database
+
 - **MySQL 8.0** - Production database (Docker)
 - **H2 Database** - In-memory database for tests
 - **HikariCP** - Connection pooling
 
 ### Frontend
+
 - **HTML5** - Structure
 - **CSS3** - Styling
 - **Vanilla JavaScript** - Client-side logic
@@ -153,6 +163,7 @@ cd SmartExpenseTrackingApp
 - **LocalStorage** - Token management
 
 ### DevOps & Tools
+
 - **Docker & Docker Compose** - Containerization
 - **Maven** - Build automation
 - **PowerShell Scripts** - Automation scripts
@@ -283,7 +294,7 @@ Open `frontend/index.html` in your browser
 
 ## 📁 Project Structure
 
-```
+````
 SmartExpenseTrackingApp/
 ├── src/
 │   ├── main/
@@ -355,7 +366,7 @@ Before running this application, ensure you have the following installed:
 ```bash
 git clone https://github.com/dmitc072/SmartExpenseTrackingApp.git
 cd SmartExpenseTrackingApp
-```
+````
 
 ### 2. Start MySQL Database (Docker)
 
@@ -368,6 +379,7 @@ docker ps
 ```
 
 **What this does:**
+
 - Downloads MySQL 8.0 image (first time only)
 - Creates `expense_db` database
 - Creates `expense_user` with password `expense_password`
@@ -375,6 +387,7 @@ docker ps
 - Runs MySQL on port 3306
 
 **Alternative:** Use the interactive setup script:
+
 ```powershell
 .\setup-docker.ps1
 # Choose option 1
@@ -457,6 +470,7 @@ The application will start on `http://localhost:8080`
 ### Frontend Access
 
 Open `frontend/dashboard.html` in your browser or:
+
 ```powershell
 start frontend\dashboard.html
 ```
@@ -520,6 +534,7 @@ Content-Type: application/json
 The application supports two testing modes:
 
 #### 1. Fast Unit Tests (H2 Database - Default)
+
 ```powershell
 # Run all tests with H2 in-memory database
 .\mvnw.cmd test
@@ -527,9 +542,11 @@ The application supports two testing modes:
 # Run specific test class
 .\mvnw.cmd test -Dtest=ExpenseApiApplicationTests
 ```
+
 **Best for**: Fast feedback during development, CI/CD pipelines
 
 #### 2. Integration Tests (Docker MySQL)
+
 ```powershell
 # Ensure Docker MySQL is running first
 docker ps
@@ -537,6 +554,7 @@ docker ps
 # Run all tests with Docker MySQL
 .\mvnw.cmd test "-Dspring.profiles.active=docker"
 ```
+
 **Best for**: End-to-end integration testing, pre-deployment validation
 
 ### Test Coverage
@@ -554,7 +572,6 @@ docker ps
   - Location: `src/test/resources/application-test.properties`
   - Automatic schema generation
   - Isolated test data for each test class
-  
 - **Docker Profile (`docker`)**: Uses Docker MySQL database
   - Location: `src/test/resources/application-docker.properties`
   - Tests against real MySQL database
@@ -616,6 +633,7 @@ This project is developed as an academic assignment for UMGC CMSC 495. All right
 The application provides two testing modes for different use cases:
 
 #### Fast Unit Tests (H2 Database)
+
 ```powershell
 # Run all tests with H2 in-memory database (default)
 .\mvnw.cmd test
@@ -626,9 +644,11 @@ The application provides two testing modes for different use cases:
 # Run specific test class
 .\mvnw.cmd test -Dtest=ExpenseControllerIntegrationTest
 ```
+
 ✅ **Use for**: Fast feedback loops, CI/CD pipelines, development
 
 #### Docker Integration Tests (MySQL)
+
 ```powershell
 # Ensure Docker MySQL is running
 docker ps --filter "name=expense-tracker-mysql"
@@ -636,13 +656,14 @@ docker ps --filter "name=expense-tracker-mysql"
 # Run all tests against Docker MySQL
 .\mvnw.cmd test "-Dspring.profiles.active=docker"
 ```
+
 ✅ **Use for**: End-to-end validation, pre-deployment testing, realistic scenarios
 
 ### Test Coverage Summary
 
 - **49 Integration Tests** covering all application layers
 - **Controller Layer**: 13 tests for REST API endpoints
-- **Service Layer**: 13 tests for business logic  
+- **Service Layer**: 13 tests for business logic
 - **Repository Layer**: 12 tests for database operations
 - **Report Service**: 10 tests for analytics features
 - **Application Context**: 1 smoke test
@@ -650,12 +671,14 @@ docker ps --filter "name=expense-tracker-mysql"
 ### Test Configuration
 
 **H2 Profile (Default - `test`)**:
+
 - Configuration: `src/test/resources/application-test.properties`
 - Database: H2 in-memory
 - Schema: Auto-generated from JPA entities
 - Isolation: Each test class gets clean database
 
 **Docker Profile (`docker`)**:
+
 - Configuration: `src/test/resources/application-docker.properties`
 - Database: Docker MySQL (localhost:3306)
 - Schema: Auto-generated on Docker MySQL
@@ -664,10 +687,12 @@ docker ps --filter "name=expense-tracker-mysql"
 ### Running Integration Tests Script
 
 For comprehensive frontend + backend + database testing:
+
 ```powershell
 # Run automated integration test script
 .\test-integration.ps1
 ```
+
 This script tests the complete stack including REST API endpoints.
 
 ## � Report API Endpoints
