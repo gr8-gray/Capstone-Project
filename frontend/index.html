@@ -1,53 +1,20 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smart Expense Tracker - Login</title>
+<!--
+  SMART EXPENSE TRACKER – INDEX PAGE
+  Author: Pukar Adhikari (Frontend Developer / Tester)
+  CMSC 495 – Capstone Project (Nov 2025)
 
-    <!-- Link to shared stylesheet for authentication and layout styling -->
-    <link rel="stylesheet" href="style.css" />
-  </head>
+  Purpose:
+  Redirects users to login.html (or dashboard if already authenticated).
+-->
 
-  <body class="auth-body">
-    <!-- ================= LOGIN PAGE CONTAINER ================= -->
-    <div class="auth-container">
-      <!-- App title -->
-      <h1>Smart Expense Tracker</h1>
-
-      <!-- ===== LOGIN FORM ===== -->
-      <form id="login-form">
-        <!-- Email/Username field -->
-        <label for="email">Email or Username</label>
-        <input 
-          type="text" 
-          id="email" 
-          placeholder="Enter your email or username" 
-          required 
-        />
-
-        <!-- Password field -->
-        <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
-          placeholder="Enter your password" 
-          required 
-        />
-
-        <!-- Submit button for login -->
-        <button type="submit" class="btn-primary">Login</button>
-
-        <!-- Link to registration page -->
-        <p>
-          Don’t have an account?
-          <a href="register.html" class="link-register">Register here</a>
-        </p>
-      </form>
-    </div>
-
-    <!-- Authentication scripts -->
-    <script src="auth.js"></script>
-    <script src="login.js"></script>
-  </body>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=login.html">
+  <title>Redirecting...</title>
+</head>
+<body>
+  <p>If you are not redirected automatically, <a href="login.html">click here</a>.</p>
+</body>
 </html>

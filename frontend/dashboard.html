@@ -1,38 +1,52 @@
-﻿<!DOCTYPE html>
+﻿<!--
+  ================================================================
+  SMART EXPENSE TRACKER – Frontend UI Component
+  Author: Pukar Adhikari (Frontend Developer / Tester)
+  Date Modified: November 2025
+
+  Description:
+  This page is part of the Smart Expense Tracker frontend and
+  provides the user interface for authentication, dashboard usage,
+  and expense tracking features. Layout, UX, and form behavior
+  were implemented and tested by the frontend developer.
+  ================================================================
+-->
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Prevent browser caching (fix Back-Button security issue) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>Smart Expense Tracker - Dashboard</title>
 
-  <!-- Link to main stylesheet for layout and styling -->
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="./style.css" />
 </head>
+
 <body>
 
-  <!-- ================= HEADER SECTION ================= -->
+  <!-- HEADER -->
   <header>
     <h1>Smart Expense Tracker</h1>
     <nav>
-      <!-- Logout button  -->
+      <span id="welcomeUser"></span>
       <a href="#" id="logoutBtn">Logout</a>
     </nav>
   </header>
 
-  <!-- ================= MAIN CONTENT AREA ================= -->
+  <!-- MAIN -->
   <main>
 
-    <!-- ===== Add Expense Form Section ===== -->
+    <!-- Add Expense -->
     <section id="add-expense-section">
       <h2>Add Expense</h2>
 
-      <!-- Form for adding a new expense -->
       <form id="expense-form">
-
-        <!-- Input: Expense name (e.g., Groceries, Rent) -->
         <input type="text" id="expense-name" placeholder="Expense Name" required />
 
-        <!-- Dropdown: Expense category (must select one) -->
         <select id="expense-category" required>
           <option value="">Select Category</option>
           <option value="Food">Food</option>
@@ -43,92 +57,68 @@
           <option value="Other">Other</option>
         </select>
 
-        <!-- Input: Expense amount -->
         <input type="number" id="expense-amount" placeholder="Amount ($)" step="0.01" min="0" required/>
-
-        <!-- Input: Expense date -->
         <input type="date" id="expense-date" required />
 
-        <!-- Button: Submit form to add new expense -->
         <button type="submit">Add</button>
       </form>
     </section>
 
-    <!-- ===== Expense History Section ===== -->
+    <!-- Expense History -->
     <section id="expense-history">
       <h2>Expense History</h2>
 
-  <!--  WRAP THE TABLE -->
-  <div class="table-wrapper">
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Amount ($)</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Category</th>
-          <th>Amount ($)</th>
-          <th>Date</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+          <tfoot>
+            <tr>
+              <td><strong>Total</strong></td>
+              <td colspan="4"><strong id="total-cell">$0.00</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
 
-      <tbody id="table-body"></tbody>
-
-      <tfoot>
-        <tr>
-          <td><strong>Total</strong></td>
-          <td id="total-cell" colspan="4"><strong>$0.00</strong></td>
-        </tr>
-      </tfoot>
-    </table>
-
-  </div> <!-- END table-wrapper -->
-
-      <!-- ===== Chart Toggle Button ===== -->
       <div style="text-align:center;margin-top:20px;">
-        <!-- Button toggles visibility of expense charts -->
         <button id="viewReportBtn" class="btn-secondary">📊 View Reports</button>
       </div>
 
-      <!-- ===== Chart Section ===== -->
       <div id="chartSection" style="display:none;margin-top:30px;">
         <h2>Expense Insights</h2>
 
-        <!-- Month filter dropdown to display monthly data -->
         <div style="text-align:center;margin-bottom:15px;">
           <label for="monthFilter">Select Month:</label>
           <select id="monthFilter">
             <option value="all">All Months</option>
-            <option value="Jan">January</option>
-            <option value="Feb">February</option>
-            <option value="Mar">March</option>
-            <option value="Apr">April</option>
-            <option value="May">May</option>
-            <option value="Jun">June</option>
-            <option value="Jul">July</option>
-            <option value="Aug">August</option>
-            <option value="Sep">September</option>
-            <option value="Oct">October</option>
-            <option value="Nov">November</option>
-            <option value="Dec">December</option>
           </select>
         </div>
 
-        <!-- Chart canvases rendered by Chart.js -->
-        <canvas id="categoryChart" width="400" height="200"></canvas>
-        <canvas id="monthlyChart" width="400" height="200" style="margin-top:30px;"></canvas>
+        <canvas id="categoryChart"></canvas>
+        <canvas id="monthlyChart" style="margin-top:30px;"></canvas>
       </div>
+
     </section>
   </main>
 
-  <!-- ================= FOOTER SCRIPTS ================= -->
-  <!-- External Chart.js library for visual reports -->
+  <!-- LIBS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Authentication module (must load before script.js) -->
-  <script src="auth.js"></script>
+  <!-- AUTH MUST LOAD FIRST -->
+  <script src="./auth.js"></script>
 
-  <!-- Main JavaScript file controlling UI logic, table rendering, and charts -->
-  <script src="script.js"></script>
+  <!-- MAIN DASHBOARD LOGIC -->
+  <script src="./script.js"></script>
+
 </body>
 </html>

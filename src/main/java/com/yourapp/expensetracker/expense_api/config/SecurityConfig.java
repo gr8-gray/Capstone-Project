@@ -21,11 +21,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-/**
- * Security configuration for the Expense Tracker API
- * Configures authentication, authorization, and CORS settings with JWT
- * @author Eric Gray - Backend Developer
- */
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -38,49 +33,45 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         http
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless REST APIs
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authz -> authz
-                        // Permit access to authentication endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
-                        // Health check and actuator endpoints
-                        .requestMatchers("/actuator/**", "/health").permitAll()
-                        // Protect all other API endpoints - require authentication
-                        .requestMatchers("/api/expenses/**",
-                                "/api/budgets/**",
-                                "/api/reports/**").authenticated()
-                        // Everything else requires authentication
-                        .anyRequest().authenticated()
-                )
-                // Add JWT authentication filter
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                // Configure authentication provider
-                .authenticationProvider(authenticationProvider());
+            .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(auth -> auth
+
+                // FRONTEND FILES
+                .requestMatchers("/", "/index.html").permitAll()
+                .requestMatchers("/frontend/**").permitAll()
+                .requestMatchers("/login.html", "/register.html", "/dashboard.html").permitAll()
+                .requestMatchers("/style.css", "/auth.js", "/login.js", "/register-script.js", "/script.js").permitAll()
+
+                // AUTH API
+                .requestMatchers("/api/auth/**").permitAll()
+
+                // PROTECTED APIS
+                .requestMatchers("/api/expenses/**",
+                                 "/api/budgets/**",
+                                 "/api/reports/**").authenticated()
+
+                .anyRequest().permitAll()
+            )
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    /**
-     * Password encoder bean for secure password hashing
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(12); // Use strength 12 for better security
+        return new BCryptPasswordEncoder(12);
     }
 
-    /**
-     * Authentication manager bean
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    /**
-     * Authentication provider using custom UserDetailsService
-     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -89,13 +80,10 @@ public class SecurityConfig {
         return authProvider;
     }
 
-    /**
-     * CORS configuration to allow frontend access
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*")); // TODO: Restrict to specific origins in production
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

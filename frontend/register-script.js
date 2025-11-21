@@ -1,115 +1,98 @@
-// ================= REGISTRATION PAGE SCRIPT =================
-// Author: Eric Gray - Backend Developer
-// Description: Handles registration form submission and validation
+/*
+ * ================================================================
+ * SMART EXPENSE TRACKER – Registration Page Script
+ * Author: Eric Gray - Backend Developer
+ * Date Modified: November 2025
+ * Modified By: Pukar Adhikari
+ *
+ * Description:
+ * Handles registration input validation, backend submission,
+ * and automatic login after successful account creation.
+ * Includes redirect logic to prevent logged-in users from viewing
+ * the registration page.
+ * ================================================================
+ */
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Redirect to dashboard if already logged in
-  redirectIfAuthenticated();
+  redirectIfAuthenticated(); // If already logged in, go to dashboard
 
+  // Retrieve all registration fields
   const registerForm = document.getElementById("register-form");
-  const nameInput = document.getElementById("name");
+  const fullNameInput = document.getElementById("full-name");
+  const usernameInput = document.getElementById("username");
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
   const confirmPasswordInput = document.getElementById("confirm-password");
 
-  // Real-time username availability check
-  let usernameCheckTimeout;
-  nameInput.addEventListener("input", () => {
-    clearTimeout(usernameCheckTimeout);
-    const username = nameInput.value.trim();
-    
-    if (username.length >= 3) {
-      usernameCheckTimeout = setTimeout(async () => {
-        const isAvailable = await checkUsernameAvailability(username);
-        if (!isAvailable) {
-          nameInput.setCustomValidity("Username already taken");
-        } else {
-          nameInput.setCustomValidity("");
-        }
-      }, 500);
-    }
-  });
+  // Ensure form exists on the page
+  if (!registerForm) {
+    console.error("register-form not found in DOM");
+    return;
+  }
 
-  // Real-time email availability check
-  let emailCheckTimeout;
-  emailInput.addEventListener("input", () => {
-    clearTimeout(emailCheckTimeout);
-    const email = emailInput.value.trim();
-    
-    if (email.includes("@")) {
-      emailCheckTimeout = setTimeout(async () => {
-        const isAvailable = await checkEmailAvailability(email);
-        if (!isAvailable) {
-          emailInput.setCustomValidity("Email already registered");
-        } else {
-          emailInput.setCustomValidity("");
-        }
-      }, 500);
-    }
-  });
-
-  // Password confirmation validation
-  confirmPasswordInput.addEventListener("input", () => {
-    if (passwordInput.value !== confirmPasswordInput.value) {
-      confirmPasswordInput.setCustomValidity("Passwords do not match");
-    } else {
-      confirmPasswordInput.setCustomValidity("");
-    }
-  });
-
-  // Handle registration form submission
+  // Registration Handler
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const username = nameInput.value.trim();
+    const fullName = fullNameInput.value.trim();
+    const username = usernameInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
 
-    // Validate inputs
-    if (!username || !email || !password || !confirmPassword) {
-      alert("Please fill in all fields");
+    // Form Validation
+    if (!fullName || !username || !email || !password || !confirmPassword) {
+      alert("Please fill in all fields.");
       return;
     }
 
     if (username.length < 3) {
-      alert("Username must be at least 3 characters long");
+      alert("Username must be at least 3 characters long.");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      alert("Please enter a valid email.");
       return;
     }
 
     if (password.length < 6) {
-      alert("Password must be at least 6 characters long");
+      alert("Password must be at least 6 characters long.");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      alert("Passwords do not match.");
       return;
     }
 
-    // Show loading state
+    // UI Feedback
     const submitButton = registerForm.querySelector('button[type="submit"]');
     const originalText = submitButton.textContent;
     submitButton.textContent = "Creating account...";
     submitButton.disabled = true;
 
     try {
-      // Call register API
-      const response = await register(username, email, password);
-      
-      // Save authentication data
-      saveAuthData(response);
+      // Calls register() in auth.js
+      const authResponse = await register(username, email, password, fullName);
 
-      // Show success message
-      alert(`Welcome, ${response.username}! Your account has been created.`);
+      console.log("Register response:", authResponse);
 
-      // Redirect to dashboard
+      // Save token + user info
+      saveAuthData(authResponse);
+
+      alert(
+        `Welcome, ${
+          authResponse.username || username
+        }! Your account has been created.`
+      );
+      // Redirect to dashbaord
       window.location.href = "dashboard.html";
-    } catch (error) {
-      // Show error message
-      alert(error.message || "Registration failed. Please try again.");
-      
-      // Reset button state
+    } catch (err) {
+      console.error("Registration error:", err);
+      alert(err.message || "Registration failed. Please try again.");
+    } finally {
+      // Restore button state regardless of success/failure
       submitButton.textContent = originalText;
       submitButton.disabled = false;
     }
