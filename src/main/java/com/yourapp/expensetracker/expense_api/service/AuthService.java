@@ -1,10 +1,5 @@
 package com.yourapp.expensetracker.expense_api.service;
 
-import com.yourapp.expensetracker.expense_api.dto.AuthResponse;
-import com.yourapp.expensetracker.expense_api.dto.LoginRequest;
-import com.yourapp.expensetracker.expense_api.dto.RegisterRequest;
-import com.yourapp.expensetracker.expense_api.model.User;
-import com.yourapp.expensetracker.expense_api.security.JwtTokenProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +11,12 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.yourapp.expensetracker.expense_api.dto.AuthResponse;
+import com.yourapp.expensetracker.expense_api.dto.LoginRequest;
+import com.yourapp.expensetracker.expense_api.dto.RegisterRequest;
+import com.yourapp.expensetracker.expense_api.model.User;
+import com.yourapp.expensetracker.expense_api.security.JwtTokenProvider;
 
 /**
  * Service for authentication operations (login, register)
@@ -52,6 +53,7 @@ public class AuthService {
                     request.getUsername(),
                     request.getEmail(),
                     request.getPassword(),
+                    request.getfullName(),
                     "USER"
             );
 
@@ -83,51 +85,65 @@ public class AuthService {
      * Login user
      */
     public AuthResponse login(LoginRequest request) {
-        logger.info("Authenticating user: {}", request.getUsernameOrEmail());
-        
-        try {
-            // Authenticate user
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getUsernameOrEmail(),
-                            request.getPassword()
-                    )
-            );
+    logger.info("Authenticating user: {}", request.getUsernameOrEmail());
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            logger.debug("User authenticated successfully: {}", authentication.getName());
+    try {
+        // Determine if login input is username or email
+        String loginInput = request.getUsernameOrEmail();
+        String usernameToUse;
 
-            // Generate JWT token
-            String token = jwtTokenProvider.generateToken(authentication);
-
-            // Get user details
-            User user = userService.getUserByUsername(authentication.getName())
-                    .orElseThrow(() -> {
-                        logger.error("User not found after successful authentication: {}", authentication.getName());
-                        return new RuntimeException("User not found");
-                    });
-
-            logger.info("Login successful for user: {}", user.getUsername());
-
-            // Return authentication response
-            return new AuthResponse(
-                    token,
-                    user.getId(),
-                    user.getUsername(),
-                    user.getEmail(),
-                    user.getRole()
-            );
-        } catch (BadCredentialsException e) {
-            logger.warn("Login failed - invalid credentials for user: {}", request.getUsernameOrEmail());
-            throw e;
-        } catch (AuthenticationException e) {
-            logger.warn("Login failed - authentication error for user {}: {}", request.getUsernameOrEmail(), e.getMessage());
-            throw e;
-        } catch (Exception e) {
-            logger.error("Unexpected error during login for user {}: {}", request.getUsernameOrEmail(), e.getMessage(), e);
-            throw new RuntimeException("Login failed: " + e.getMessage(), e);
+        if (loginInput.contains("@")) {
+            // Login using email
+            usernameToUse = userService.getUserByEmail(loginInput)
+                    .map(User::getUsername)
+                    .orElseThrow(() -> new BadCredentialsException("Invalid email"));
+        } else {
+            // Login using username
+            usernameToUse = loginInput;
         }
+
+        logger.info("Authenticating using username: {}", usernameToUse);
+
+        // Authenticate with Spring Security
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        usernameToUse,
+                        request.getPassword()
+                )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        logger.debug("User authenticated successfully: {}", authentication.getName());
+
+        // Fetch the authenticated user
+        User user = userService.getUserByUsername(authentication.getName())
+                .orElseThrow(() -> new RuntimeException("User not found after authentication"));
+
+        logger.info("Login successful for user: {}", user.getUsername());
+
+        // Generate JWT token
+        String token = jwtTokenProvider.generateToken(authentication);
+
+        return new AuthResponse(
+                token,
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole()
+        );
+
+    } catch (BadCredentialsException e) {
+        logger.warn("Invalid credentials for user: {}", request.getUsernameOrEmail());
+        throw e;
+    } catch (AuthenticationException e) {
+        logger.warn("Authentication error for user {}: {}", request.getUsernameOrEmail(), e.getMessage());
+        throw e;
+    } catch (Exception e) {
+        logger.error("Unexpected login error for user {}: {}", request.getUsernameOrEmail(), e.getMessage(), e);
+        throw new RuntimeException("Login failed: " + e.getMessage(), e);
     }
+}
 
     /**
      * Get currently authenticated user from security context

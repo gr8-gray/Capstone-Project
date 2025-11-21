@@ -1,5 +1,20 @@
 package com.yourapp.expensetracker.expense_api.controller;
 
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.yourapp.expensetracker.expense_api.dto.AuthResponse;
 import com.yourapp.expensetracker.expense_api.dto.LoginRequest;
 import com.yourapp.expensetracker.expense_api.dto.RegisterRequest;
@@ -7,15 +22,8 @@ import com.yourapp.expensetracker.expense_api.dto.UserDTO;
 import com.yourapp.expensetracker.expense_api.model.User;
 import com.yourapp.expensetracker.expense_api.service.AuthService;
 import com.yourapp.expensetracker.expense_api.service.UserService;
-import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import jakarta.validation.Valid;
 
 /**
  * REST Controller for authentication operations
