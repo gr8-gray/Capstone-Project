@@ -1,9 +1,9 @@
-/* 
+/*
  * ================================================================
  * ================= AUTHENTICATION MODULE =================
  * Author: Eric Gray - Backend Developer
  * Description: Handles authentication, token management, and API calls
- * 
+ *
  * Modified by Pukar Adhikari
  *
  * Description:
@@ -171,32 +171,39 @@ async function register(firstName, lastName, username, email, password) {
       body: JSON.stringify({ firstName, lastName, username, email, password }),
     });
 
-    const data = await response.json();
+    // Safe JSON parse
+    let data = await response.json().catch(() => ({}));
 
     // Handle duplicate username or email
     if (!response.ok) {
-      let message = "Registration failed";
+  let message = "Registration failed";
 
-      if (data.error) {
-        message = data.error;
-      } else if (response.status === 400) {
-        if (data.message?.includes("username")) message = "Username already exists";
-        if (data.message?.includes("email")) message = "Email already exists";
-      }
-
-      log(LOG_LEVELS.WARN, "Registration failed:", message);
-      throw new Error(message);
+  if (data.error) {
+    message = data.error;
+  } else if (response.status === 400) {
+    if (data.message?.includes("username")) {
+      message = "Username already exists";
     }
+    if (data.message?.includes("email")) {
+      message = "Email already exists";
+    }
+  }
 
+  log(LOG_LEVELS.WARN, "Registration failed:", message);
+  throw new Error(message);
+}
+
+
+    // This will now only run when registration TRULY succeeded
     log(LOG_LEVELS.INFO, "User registered successfully");
     return data;
 
   } catch (err) {
-    // Network error
     if (err.name === "TypeError" && err.message.includes("fetch")) {
-      throw new Error("Unable to connect to server. Please check if backend is running.");
+      throw new Error(
+        "Unable to connect to server. Please check if the backend is running."
+      );
     }
-
     throw err;
   }
 }
