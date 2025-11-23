@@ -7,7 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
   redirectIfAuthenticated();
 
   const registerForm = document.getElementById("register-form");
-  const nameInput = document.getElementById("full-name");
+  const firstNameInput = document.getElementById("first-name");
+  const lastNameInput = document.getElementById("last-name");
+  const usernameInput = document.getElementById("username");
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
   const confirmPasswordInput = document.getElementById("confirm-password");
@@ -34,14 +36,16 @@ document.addEventListener("DOMContentLoaded", () => {
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const username = nameInput.value.trim();
+    const firstName = firstNameInput.value.trim();
+    const lastName = lastNameInput.value.trim();
+    const username = usernameInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
 
-    // Validate inputs
-    if (!username || !email || !password || !confirmPassword) {
-      alert("Please fill in all fields");
+    // Form Validation
+    if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
+      alert("Please fill in all fields.");
       return;
     }
 
@@ -91,20 +95,16 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Submitting registration:" + originalText);
 
     try {
-      // Call register API
-      const response = await register(username, email, password);
+      // Calls register() in auth.js
+      const authResponse = await register(firstName, lastName, username, email, password);
 
-      // Save authentication data (if backend returns token/user)
-      saveAuthData(response);
+      console.log("Register response:", authResponse);
 
-      // Show success message
-      showSuccess(
-        `Welcome, ${
-          response.username || username
-        }! Your account has been created.`
-      );
+      // Save token + user info
+      saveAuthData(authResponse);
 
-      // Redirect to dashboard
+      alert(`Welcome, ${authResponse.username || username}! Your account has been created.`);
+      // Redirect to dashbaord
       window.location.href = "dashboard.html";
     } catch (error) {
       console.error("Registration error:", error);

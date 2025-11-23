@@ -161,42 +161,50 @@ async function authenticatedFetch(url, options = {}) {
 }
 
 // ===== AUTH API CALLS =====
-async function register(username, email, password, fullName) {
+async function register(firstName, lastName, username, email, password) {
   log(LOG_LEVELS.INFO, `Attempting to register user: ${username}`);
 
   try {
     const response = await fetch(`${AUTH_API_URL}/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password, fullName }),
+      body: JSON.stringify({ firstName, lastName, username, email, password }),
     });
 
     // Safe JSON parse
     let data = await response.json().catch(() => ({}));
 
+    // Handle duplicate username or email
     if (!response.ok) {
-      const msg =
-        data.message ||
-        data.error ||
-        data.details ||
-        `Registration failed (${response.status})`;
+  let message = "Registration failed";
 
-      log(LOG_LEVELS.WARN, "Registration failed:", msg, data);
-      throw new Error(msg);
+  if (data.error) {
+    message = data.error;
+  } else if (response.status === 400) {
+    if (data.message?.includes("username")) {
+      message = "Username already exists";
     }
+    if (data.message?.includes("email")) {
+      message = "Email already exists";
+    }
+  }
+
+  log(LOG_LEVELS.WARN, "Registration failed:", message);
+  throw new Error(message);
+}
+
 
     // This will now only run when registration TRULY succeeded
     log(LOG_LEVELS.INFO, "User registered successfully");
     return data;
+
   } catch (err) {
-    // Handle offline/server-down
-    if (err.name === "TypeError") {
+    if (err.name === "TypeError" && err.message.includes("fetch")) {
       throw new Error(
-        "Unable to connect to the server. Please ensure backend is running."
+        "Unable to connect to server. Please check if the backend is running."
       );
     }
-
-    throw err; // propagate real backend errors
+    throw err;
   }
 }
 
