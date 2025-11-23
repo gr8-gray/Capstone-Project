@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Retrieve all registration fields
   const registerForm = document.getElementById("register-form");
-  const fullNameInput = document.getElementById("full-name");
+  const firstNameInput = document.getElementById("first-name");
+  const lastNameInput = document.getElementById("last-name");
   const usernameInput = document.getElementById("username");
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
@@ -34,14 +35,15 @@ document.addEventListener("DOMContentLoaded", () => {
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const fullName = fullNameInput.value.trim();
+    const firstName = firstNameInput.value.trim();
+    const lastName = lastNameInput.value.trim();
     const username = usernameInput.value.trim();
     const email = emailInput.value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
 
     // Form Validation
-    if (!fullName || !username || !email || !password || !confirmPassword) {
+    if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
       alert("Please fill in all fields.");
       return;
     }
@@ -74,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       // Calls register() in auth.js
-      const authResponse = await register(username, email, password, fullName);
+      const authResponse = await register(firstName, lastName, username, email, password);
 
       console.log("Register response:", authResponse);
 

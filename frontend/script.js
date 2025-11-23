@@ -18,14 +18,17 @@
 
   // If no token, redirect before anything renders
   if (!token || token.length < 10) {
-    console.warn("[SECURITY] No token found — redirecting to login.");
     window.location.replace("login.html");
   }
 })();
 
 document.addEventListener("DOMContentLoaded", () => {
-
-  console.log("[INFO] Waiting for token before initializing dashboard...");
+  
+  // Prevent ANY accidental form submission refresh
+  document.getElementById("expense-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    return false;
+  });
 
   // ===== API BASE =====
   const API_BASE_URL = "http://localhost:8080/api/expenses";
@@ -41,6 +44,19 @@ document.addEventListener("DOMContentLoaded", () => {
     const [y, m, d] = fixed.split("-");
     return `${m}/${d}/${y}`;
   }
+  
+  // ===== WAIT UNTIL TOKEN EXISTS (PREVENT 403 + DELAYS) =====
+  async function waitForValidToken() {
+    return new Promise(resolve => {
+      const check = setInterval(() => {
+        const t = localStorage.getItem("token");
+        if (t && t.length > 10) {
+          clearInterval(check);
+          resolve(t);
+        }
+      }, 50);
+    });
+  }
 
   // ===== DOM ELEMENTS =====
   const form = document.getElementById("expense-form");
@@ -55,11 +71,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ===== API CALLS =====
   async function fetchExpenses() {
-    console.log("[INFO] Fetching expenses...");
+    await waitForValidToken();
     try {
       const res = await authenticatedFetch(API_BASE_URL);
       expenses = await res.json();
       renderTable();
+      populateMonthFilter();
     } catch (err) {
       console.error(err);
       alert("Could not load expenses from server.");
@@ -67,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function addExpense(expense) {
+    await waitForValidToken();
     const res = await authenticatedFetch(API_BASE_URL, {
       method: "POST",
       body: JSON.stringify(expense),
@@ -75,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function updateExpense(id, data) {
+    await waitForValidToken();
     const res = await authenticatedFetch(`${API_BASE_URL}/${id}`, {
       method: "PUT",
       body: JSON.stringify(data),
@@ -83,6 +102,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function deleteExpense(id) {
+    await waitForValidToken();
     await authenticatedFetch(`${API_BASE_URL}/${id}`, { method: "DELETE" });
   }
 
@@ -104,8 +124,8 @@ document.addEventListener("DOMContentLoaded", () => {
         <td>$${Number(exp.amount).toFixed(2)}</td>
         <td>${toLocale(exp.date)}</td>
         <td>
-          <button class="edit-btn" data-id="${exp.id}" data-index="${index}">✏️</button>
-          <button class="delete-btn" data-id="${exp.id}" data-index="${index}">❌</button>
+          <button class="edit-btn" type="button" data-id="${exp.id}" data-index="${index}">✏️</button>
+          <button class="delete-btn" type="button" data-id="${exp.id}" data-index="${index}">❌</button>
         </td>
       `;
       tbody.appendChild(row);
@@ -115,14 +135,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ===== ADD EXPENSE =====
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
+  document.getElementById("addBtn").addEventListener("click", async () => {
     const expense = {
       description: nameEl.value.trim(),
       category: catEl.value,
       amount: Number(amtEl.value),
-      date: dateEl.value,
+      date: dateEl.value
     };
 
     if (!expense.description || !expense.category || !expense.date || expense.amount <= 0) {
@@ -131,13 +149,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     try {
-      await addExpense(expense);
-      await fetchExpenses();
-      form.reset();
-    } catch {
-      alert("Failed to add expense.");
+      const res = await addExpense(expense);
+
+      if (res && res.id) {
+      // Update client immediately (NO re-fetch)
+        expenses.push(res);
+        renderTable();
+        form.reset();
+    } else {
+      alert("Unexpected server response.");
     }
-  });
+
+  } catch (err) {
+    console.error("Add expense error:", err);
+    alert("Could not add expense. Please try again.");
+  }
+});
 
   // ===== EDIT / DELETE =====
   tbody.addEventListener("click", async (e) => {
@@ -149,7 +176,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (btn.classList.contains("delete-btn")) {
       if (confirm("Delete this expense?")) {
         await deleteExpense(id);
-        await fetchExpenses();
+        expenses.splice(idx, 1);
+        renderTable();
       }
       return;
     }
@@ -206,37 +234,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         await updateExpense(id, updated);
-        await fetchExpenses();
+        expenses[idx] = { ...expenses[idx], ...updated };
+        renderTable();
       };
     }
   });
 
   // ===== WAIT FOR TOKEN, THEN AUTH + LOAD =====
-  console.log("[INFO] Waiting for token before loading expenses...");
-
   let attempts = 0;
   const waitForToken = setInterval(() => {
     const token = localStorage.getItem("token");
-    console.log("[DEBUG] Token check attempt", attempts, "value:", token);
 
     if (token && token.length > 10) {
       clearInterval(waitForToken);
-
-      console.log("[INFO] Token detected — initializing dashboard.");
 
       // NOW SAFE TO RUN AUTH CHECK
       requireAuth();
 
       // NOW RENDER USER HEADER
       const user = getUser();
-      const nav = document.querySelector("nav");
-      if (nav && user) {
-        const span = document.createElement("span");
-        span.textContent = `Welcome, ${user.username}`;
-        span.style.marginRight = "15px";
-        span.style.fontWeight = "bold";
-        span.style.color = "white";
-        nav.prepend(span);
+      if (user) {
+        const welcomeEl = document.getElementById("welcomeUser");
+        if (welcomeEl.textContent.trim() === "") {
+          welcomeEl.textContent = "Welcome, " + user.username;
+        }
       }
 
       // NOW LOAD EXPENSES
@@ -262,41 +283,88 @@ document.addEventListener("DOMContentLoaded", () => {
     if (chartsVisible) renderCharts();
   });
 
-  function renderCharts() {
-    const catTotals = {};
-    const monthTotals = {};
+  // ===== POPULATE MONTH FILTER =====
+  function populateMonthFilter() {
+    const monthFilter = document.getElementById("monthFilter");
+    if (!monthFilter) return;
 
-    expenses.forEach((exp) => {
-      const fixed = toLocalDate(exp.date);
-      const month = new Date(fixed).toLocaleString("default", { month: "short" });
+    // Always show full list of months
+    const allMonths = [
+      "Jan","Feb","Mar","Apr","May","Jun",
+      "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
 
-      catTotals[exp.category] = (catTotals[exp.category] || 0) + Number(exp.amount);
-      monthTotals[month] = (monthTotals[month] || 0) + Number(exp.amount);
+    monthFilter.innerHTML = `<option value="all">All Months</option>`;
+
+    allMonths.forEach(m => {
+      monthFilter.innerHTML += `<option value="${m}">${m}</option>`;
     });
 
-    const categories = Object.keys(catTotals);
-    const categoryAmounts = Object.values(catTotals);
+    // When user changes month -> update charts instantly
+    monthFilter.addEventListener("change", renderCharts);
+  }
 
-    const months = Object.keys(monthTotals);
-    const monthlyAmounts = Object.values(monthTotals);
 
+  function renderCharts() {
+    const monthFilter = document.getElementById("monthFilter");
+    const selectedMonth = monthFilter ? monthFilter.value : "all";
+
+    // Always track totals for all 12 months
+    const monthTotals = {
+      Jan: 0, Feb: 0, Mar: 0, Apr: 0, May: 0, Jun: 0,
+      Jul: 0, Aug: 0, Sep: 0, Oct: 0, Nov: 0, Dec: 0,
+    };
+
+    // Category totals (pie chart)
+    const categoryTotals = {};
+
+    expenses.forEach(exp => {
+      const fixed = toLocalDate(exp.date);
+      const date = new Date(fixed);
+
+      const monthName = date.toLocaleString("default", { month: "short" });
+
+      // Always add to month totals (bar chart)
+      monthTotals[monthName] += Number(exp.amount);
+
+      // For pie chart — filter by selected month
+      if (selectedMonth === "all" || selectedMonth === monthName) {
+        categoryTotals[exp.category] =
+          (categoryTotals[exp.category] || 0) + Number(exp.amount);
+      }
+    });
+
+    // Prepare pie data
+    const categoryLabels = Object.keys(categoryTotals);
+    const categoryAmounts = Object.values(categoryTotals);
+
+    // Prepare bar data (fixed order)
+    const monthsOrdered = Object.keys(monthTotals);
+    const monthAmounts = Object.values(monthTotals);
+
+    // Destroy old charts
     if (window.categoryChartObj) window.categoryChartObj.destroy();
     if (window.monthlyChartObj) window.monthlyChartObj.destroy();
 
+    // ===== CATEGORY PIE CHART =====
     window.categoryChartObj = new Chart(document.getElementById("categoryChart"), {
       type: "pie",
       data: {
-        labels: categories,
+        labels: categoryLabels,
         datasets: [{ data: categoryAmounts }],
-      },
+      }
     });
 
+    // ===== MONTHLY BAR GRAPH =====
     window.monthlyChartObj = new Chart(document.getElementById("monthlyChart"), {
       type: "bar",
       data: {
-        labels: months,
-        datasets: [{ label: "Total", data: monthlyAmounts }],
-      },
+        labels: monthsOrdered,
+        datasets: [{
+          label: "Monthly Total ($)",
+          data: monthAmounts
+        }],
+      }
     });
   }
 
