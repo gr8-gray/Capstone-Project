@@ -77,7 +77,7 @@ public class AuthService {
             throw e;
         } catch (Exception e) {
             logger.error("Unexpected error during registration for user {}: {}", request.getUsername(), e.getMessage(), e);
-            throw new RuntimeException("Registration failed: " + e.getMessage(), e);
+            throw e;
         }
     }
 

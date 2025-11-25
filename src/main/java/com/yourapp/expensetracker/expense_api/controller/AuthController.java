@@ -64,7 +64,7 @@ public class AuthController {
         } catch (Exception e) {
             logger.error("Registration failed for username: {} - {}", request.getUsername(), e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Registration failed. Please try again later."));
+                    .body(Map.of("message", e.getMessage()));
         }
     }
 
@@ -74,6 +74,7 @@ public class AuthController {
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
+        
         logger.info("Login attempt for user: {}", request.getUsernameOrEmail());
         try {
             AuthResponse response = authService.login(request);
@@ -85,6 +86,7 @@ public class AuthController {
                     .body(Map.of("error", "Invalid username/email or password"));
         }
     }
+
 
     /**
      * Get current user profile
