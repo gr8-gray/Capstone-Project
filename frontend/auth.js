@@ -160,53 +160,46 @@ async function authenticatedFetch(url, options = {}) {
   }
 }
 
-// ===== AUTH API CALLS =====
-async function register(firstName, lastName, username, email, password) {
-  log(LOG_LEVELS.INFO, `Attempting to register user: ${username}`);
+  // ===== AUTH API CALLS =====
+  async function register(firstName, lastName, username, email, password) {
+    log(LOG_LEVELS.INFO, `Attempting to register user: ${username}`);
 
-  try {
-    const response = await fetch(`${AUTH_API_URL}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ firstName, lastName, username, email, password }),
-    });
+    try {
+      const response = await fetch(`${AUTH_API_URL}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ firstName, lastName, username, email, password }),
+      });
 
-    // Safe JSON parse
-    let data = await response.json().catch(() => ({}));
+      // Safely parse JSON
+      let data = await response.json().catch(() => ({}));
 
-    // Handle duplicate username or email
-    if (!response.ok) {
-  let message = "Registration failed";
+      // ----------- ERROR HANDLING -----------
+      if (!response.ok) {
+        let message = "Registration failed. Please try again.";
 
-  if (data.error) {
-    message = data.error;
-  } else if (response.status === 400) {
-    if (data.message?.includes("username")) {
-      message = "Username already exists";
-    }
-    if (data.message?.includes("email")) {
-      message = "Email already exists";
+        // ⭐ Use backend message EXACTLY as provided
+        if (data && data.message) {
+          message = data.message;
+        }
+
+        throw new Error(message);
+      }
+      // ----------- END ERROR HANDLING -----------
+
+      log(LOG_LEVELS.INFO, "User registered successfully");
+      return data;
+
+    } catch (err) {
+      // Hide technical errors from users
+      if (err.name === "TypeError" && err.message.includes("fetch")) {
+        console.error("Network/server error:", err);
+        throw new Error("Something went wrong. Please try again.");
+      }
+
+      throw err;
     }
   }
-
-  log(LOG_LEVELS.WARN, "Registration failed:", message);
-  throw new Error(message);
-}
-
-
-    // This will now only run when registration TRULY succeeded
-    log(LOG_LEVELS.INFO, "User registered successfully");
-    return data;
-
-  } catch (err) {
-    if (err.name === "TypeError" && err.message.includes("fetch")) {
-      throw new Error(
-        "Unable to connect to server. Please check if the backend is running."
-      );
-    }
-    throw err;
-  }
-}
 
 async function login(usernameOrEmail, password) {
   console.log("AUTH.JS login() CALLED");
