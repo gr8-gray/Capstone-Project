@@ -14,8 +14,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import com.yourapp.expensetracker.expense_api.model.Expense;
+import com.yourapp.expensetracker.expense_api.model.User;
+import com.yourapp.expensetracker.expense_api.service.AuthService;
 import com.yourapp.expensetracker.expense_api.service.ExpenseService;
 
 import jakarta.validation.Valid;
@@ -34,10 +35,13 @@ public class ExpenseController {
     private static final Logger logger = LoggerFactory.getLogger(ExpenseController.class);
 
     private final ExpenseService expenseService;
+    
+    private final AuthService authService;
 
     @Autowired
-    public ExpenseController(ExpenseService expenseService) {
+    public ExpenseController(ExpenseService expenseService, AuthService authService) {
         this.expenseService = expenseService;
+        this.authService = authService;
     }
 
     /**
@@ -52,6 +56,9 @@ public class ExpenseController {
             // SecurityContext context = SecurityContextHolder.getContext();
             // Authentication authentication = context.getAuthentication();
             
+            User currentUser = authService.getCurrentUser();
+            newExpense.setUser(currentUser);
+
             Expense savedExpense = expenseService.createExpense(newExpense);
             logger.info("Expense created successfully with ID: {}", savedExpense.getId());
             return ResponseEntity.status(HttpStatus.CREATED).body(savedExpense);
@@ -74,7 +81,8 @@ public class ExpenseController {
         logger.debug("Fetching all expenses");
         try {
             // TODO: Filter by currently logged-in user when User entity is implemented
-            List<Expense> expenses = expenseService.getAllExpenses();
+            User currentUser = authService.getCurrentUser();
+            List<Expense> expenses = expenseService.getExpensesByUserId(currentUser.getId());
             logger.info("Retrieved {} expenses", expenses.size());
             return ResponseEntity.ok(expenses);
         } catch (Exception e) {
@@ -90,12 +98,23 @@ public class ExpenseController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getExpenseById(@PathVariable Long id) {
         try {
-            Optional<Expense> expense = expenseService.getExpenseById(id);
-            if (expense.isPresent()) {
-                return ResponseEntity.ok(expense.get());
-            } else {
+            Optional<Expense> expenseOpt = expenseService.getExpenseById(id);
+
+            if (expenseOpt.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
+
+            Expense expense = expenseOpt.get();
+            User currentUser = authService.getCurrentUser();
+
+            
+            if (!expense.getUser().getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Access denied"));
+            }
+
+            return ResponseEntity.ok(expense);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to retrieve expense"));
@@ -109,13 +128,26 @@ public class ExpenseController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateExpense(@PathVariable Long id, @Valid @RequestBody Expense updatedExpense) {
         try {
-            // TODO: Verify user owns this expense when User entity is implemented
-            Expense expense = expenseService.updateExpense(id, updatedExpense);
-            return ResponseEntity.ok(expense);
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("not found")) {
+            Optional<Expense> existingOpt = expenseService.getExpenseById(id);
+
+            if (existingOpt.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
+
+            Expense existing = existingOpt.get();
+            User currentUser = authService.getCurrentUser();
+
+            if (!existing.getUser().getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Access denied"));
+            }
+
+            updatedExpense.setUser(currentUser); // preserve ownership
+
+            Expense expense = expenseService.updateExpense(id, updatedExpense);
+            return ResponseEntity.ok(expense);
+
+        } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -130,14 +162,24 @@ public class ExpenseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteExpense(@PathVariable Long id) {
         try {
-            // TODO: Verify user owns this expense when User entity is implemented
-            expenseService.deleteExpense(id);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            if (e.getMessage().contains("not found")) {
+            Optional<Expense> existingOpt = expenseService.getExpenseById(id);
+
+            if (existingOpt.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+
+            Expense existing = existingOpt.get();
+            User currentUser = authService.getCurrentUser();
+
+            
+            if (!existing.getUser().getId().equals(currentUser.getId())) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Access denied"));
+            }
+
+            expenseService.deleteExpense(id);
+            return ResponseEntity.noContent().build();
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", "Failed to delete expense"));

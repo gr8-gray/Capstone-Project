@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const res = await addExpense(expense);
 
       if (res && res.id) {
-      // Update client immediately (NO re-fetch)
+      // Update client immediately
         expenses.push(res);
         renderTable();
         form.reset();
@@ -367,6 +367,11 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // ===== Change Password =====
+  document.getElementById("changePasswordLink").addEventListener("click", () => {
+    window.location.href = "change_password.html";
+  });
 
   // ===== LOGOUT =====
   document.getElementById("logoutBtn").addEventListener("click", () => {

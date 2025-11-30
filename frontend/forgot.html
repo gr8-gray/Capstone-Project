@@ -1,0 +1,154 @@
+<!--
+  ===============================================================
+  SMART EXPENSE TRACKER – LOGIN PAGE
+  CMSC 495 – Capstone Project
+  Author: Pukar Adhikari (Frontend Developer / Tester)
+
+  Purpose:
+  Displays the forgot password form and connects to the authentication API.
+  Includes email input fields and links to login.
+  ===============================================================
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Reset Password</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+
+    .reset-container {
+        background: white;
+        width: 350px;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .reset-container h2 {
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 22px;
+    }
+
+    input[type="email"] {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+
+    .btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn:hover {
+        background-color: #0056cc;
+    }
+
+    .message {
+        margin-top: 15px;
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    .message.success {
+        color: green;
+    }
+
+    .message.error {
+        color: red;
+    }
+
+    a {
+        display: block;
+        margin-top: 15px;
+        font-size: 14px;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+</style>
+</head>
+
+<body>
+
+<div class="reset-container">
+    <h2>Forgot Password</h2>
+
+    <input id="emailInput" type="email" placeholder="Enter your email" />
+
+    <button class="btn" onclick="resetPassword()">Reset Password</button>
+
+    <div id="messageBox" class="message"></div>
+
+    <a href="login.html">← Back to Login</a>
+</div>
+
+<script>
+async function resetPassword() {
+    const email = document.getElementById("emailInput").value.trim();
+    const msgBox = document.getElementById("messageBox");
+
+    msgBox.textContent = "";
+    msgBox.className = "message";
+
+    if (!email) {
+        msgBox.textContent = "Please enter your email.";
+        msgBox.classList.add("error");
+        return;
+    }
+
+    try {
+        const response = await fetch(
+            "http://localhost:8080/api/auth/reset-password?email=" + encodeURIComponent(email),
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+            msgBox.textContent = data.message;
+            msgBox.classList.add("success");
+        } else {
+            msgBox.textContent = data.error || "Something went wrong.";
+            msgBox.classList.add("error");
+        }
+
+    } catch (error) {
+        msgBox.textContent = "Server error. Try again later.";
+        msgBox.classList.add("error");
+    }
+}
+</script>
+
+</body>
+</html>

@@ -59,7 +59,7 @@ function showSuccess(message) {
 
 // Store token + user info
 function saveAuthData(authResponse) {
-  // Try several common token field names (in case backend differs)
+  
   const token =
     authResponse.token ||
     authResponse.jwt ||
@@ -107,7 +107,7 @@ function clearAuthData() {
   localStorage.removeItem("user");
 }
 
-// Logout user anda return to login screen
+// Logout user and return to login screen
 function logout() {
   clearAuthData();
   window.location.href = "login.html";
@@ -178,7 +178,7 @@ async function authenticatedFetch(url, options = {}) {
       if (!response.ok) {
         let message = "Registration failed. Please try again.";
 
-        // ⭐ Use backend message EXACTLY as provided
+        // Use backend message EXACTLY as provided
         if (data && data.message) {
           message = data.message;
         }

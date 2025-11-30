@@ -64,29 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Check username + email availability (only on submit)
-    // try {
-    //   const [isUsernameAvailable, isEmailAvailable] = await Promise.all([
-    //     checkUsernameAvailability(username),
-    //     checkEmailAvailability(email),
-    //   ]);
-
-    //   if (!isUsernameAvailable) {
-    //     alert("Username already taken. Please choose another.");
-    //     return;
-    //   }
-
-    //   if (!isEmailAvailable) {
-    //     alert("Email already registered. Try logging in instead.");
-    //     return;
-    //   }
-    // } catch (err) {
-    //   console.error("Availability check failed:", err);
-    //   // Optional: block registration if availability check fails
-    //   // alert("Unable to verify username/email right now. Please try again.");
-    //   // return;
-    // }
-
     // Show loading state
     const submitButton = registerForm.querySelector('button[type="submit"]');
     const originalText = submitButton.textContent;
