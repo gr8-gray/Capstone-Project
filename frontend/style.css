@@ -22,14 +22,6 @@ body {
 
 /* ======= HEADER ======= */
 /* Styles header background, title, and navigation links */
-header {
-  background-color: #007acc;
-  color: white;
-  width: 100%;
-  padding: 25px 0;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
 
 header h1 {
   margin: 0;
@@ -37,14 +29,70 @@ header h1 {
   letter-spacing: 1px;
 }
 
-/* Logout link in header */
-header nav a {
-  display: inline-block;
-  margin-top: 10px;
+header {
+  background-color: #007acc;
+  color: white;
+  width: 100%;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header-left h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    padding-right: 20px;   
+}
+
+.header-right a {
   color: white;
   text-decoration: none;
-  font-weight: bold;
-  transition: 0.3s;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.header-right a:hover {
+  opacity: 0.7;
+}
+
+.divider {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .header-right {
+    gap: 8px;
+    font-size: 14px;
+  }
+}
+
+/* Limit width of header content and center it */
+.header-container {
+    width: 95%;
+    max-width: 1200px; /* adjust to fit your design */
+    margin: 0 auto; /* centers the entire header content */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 header nav a:hover {
@@ -323,6 +371,23 @@ tfoot td {
   margin-bottom: 25px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 }
+
+/* Reduce chart height and keep it proportional */
+#categoryChart,
+#monthlyChart {
+    max-height: 280px !important;
+    height: 280px !important;
+    width: 100% !important;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Reduce spacing around the entire chart section */
+#chartSection {
+    padding: 10px 0;
+    margin-top: 10px;
+}
+
 
 canvas {
   max-width: 100%;

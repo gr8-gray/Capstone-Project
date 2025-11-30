@@ -59,11 +59,20 @@ public class Expense {
     private LocalDateTime updatedAt;
 
     // TODO: Add User relationship when User entity is implemented
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "user_id", nullable = false)
-    // private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     // Constructors
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    
     public Expense() {
     }
 

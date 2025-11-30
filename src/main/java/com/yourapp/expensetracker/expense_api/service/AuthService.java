@@ -11,6 +11,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import com.yourapp.expensetracker.expense_api.repository.UserRepository;
+import com.yourapp.expensetracker.expense_api.model.User;
 
 import com.yourapp.expensetracker.expense_api.dto.AuthResponse;
 import com.yourapp.expensetracker.expense_api.dto.LoginRequest;
@@ -29,16 +32,22 @@ public class AuthService {
     private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     private final UserService userService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
     public AuthService(UserService userService, 
                       JwtTokenProvider jwtTokenProvider,
-                      AuthenticationManager authenticationManager) {
+                      AuthenticationManager authenticationManager,
+                      UserRepository userRepository,
+                      PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.jwtTokenProvider = jwtTokenProvider;
         this.authenticationManager = authenticationManager;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -144,6 +153,35 @@ public class AuthService {
         throw new RuntimeException("Login failed: " + e.getMessage(), e);
     }
 }
+
+    public void resetPassword(String email) {
+        logger.info("Attempting to reset password for email: {}", email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String tempPassword = "Temp@1234";
+
+        String hashed = passwordEncoder.encode(tempPassword);
+        user.setPasswordHash(hashed);
+
+        userRepository.save(user);
+
+        logger.info("Password reset successfully for user ID {}", user.getId());
+    }
+
+    public void changePassword(String oldPassword, String newPassword) {
+        User user = getCurrentUser(); // fetch logged-in user
+
+        // Verify old password
+        if (!passwordEncoder.matches(oldPassword, user.getPasswordHash())) {
+            throw new RuntimeException("Old password is incorrect");
+        }
+
+        // Save new hashed password
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 
     /**
      * Get currently authenticated user from security context

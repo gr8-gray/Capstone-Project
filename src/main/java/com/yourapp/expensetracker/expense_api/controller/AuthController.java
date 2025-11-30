@@ -106,6 +106,49 @@ public class AuthController {
                     .body(Map.of("error", "Not authenticated"));
         }
     }
+    /**
+     * Reset Password
+     */
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestParam String email) {
+        logger.info("Password reset requested for email: {}", email);
+
+        try {
+            authService.resetPassword(email);
+            logger.info("Temporary password set for email: {}", email);
+
+            return ResponseEntity.ok(
+                Map.of("message", "Temporary password has been set: Temp@1234")
+            );
+
+        } catch (RuntimeException e) {
+        
+            logger.warn("Password reset failed for {}: {}", email, e.getMessage());
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            logger.error("Unexpected error during password reset for {}: {}", email, e.getMessage(), e);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Unexpected server error"));
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody Map<String, String> payload) {
+
+        String oldPassword = payload.get("oldPassword");
+        String newPassword = payload.get("newPassword");
+
+        try {
+            authService.changePassword(oldPassword, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
+        } catch (RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+    }
+}
 
     /**
      * Logout (client-side token removal)
