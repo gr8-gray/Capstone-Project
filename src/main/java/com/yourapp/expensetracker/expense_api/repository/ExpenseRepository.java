@@ -17,7 +17,7 @@ import java.util.List;
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
 
     // Custom query methods using Spring Data JPA naming conventions
-
+    List<Expense> findByUserId(Long userId);
     /**
      * Find expenses by category
      */

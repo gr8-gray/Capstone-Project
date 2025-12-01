@@ -9,6 +9,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -58,6 +60,13 @@ public class User {
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 
+    @Column(name = "secret_question")
+    private String secretQuestion;
+
+    @Column(name = "secret_answer_hash")
+    private String secretAnswerHash;
+
+
     /**
      * User's first name.
      */
@@ -95,6 +104,9 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<Expense> expenses = new java.util.ArrayList<>();
 
     // --- Constructors ---
 
@@ -164,6 +176,22 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getSecretQuestion() {
+        return secretQuestion;
+    }
+
+    public void setSecretQuestion(String secretQuestion) {
+        this.secretQuestion = secretQuestion;
+    }
+
+    public String getSecretAnswerHash() {
+        return secretAnswerHash;
+    }
+
+    public void setSecretAnswerHash(String secretAnswerHash) {
+        this.secretAnswerHash = secretAnswerHash;
     }
 
     public String getRole() {

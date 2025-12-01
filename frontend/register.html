@@ -1,3 +1,11 @@
+<!--
+  SMART EXPENSE TRACKER – REGISTER PAGE
+  Author: Pukar Adhikari (Frontend Developer / Tester)
+  CMSC 495 – Capstone Project (Nov 2025)
+
+  Purpose:
+  Redirects users to login.html.
+-->
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -11,6 +19,20 @@
   <body class="auth-body">
     <div class="auth-container">
       <h1>Create Your Account</h1>
+
+      <!-- Error Message -->
+      <div id="error-message"
+            style="
+              display:none;
+              background:#8465cc;
+              color:white;
+              padding: 8px;
+              border-radius:4px;
+              margin: bottom 10px;
+              font-weight:bold;
+              text-align:center;
+            ">
+      </div>
 
       <form id="register-form">
 
@@ -66,6 +88,26 @@
           type="password"
           id="confirm-password"
           placeholder="Confirm password"
+          required
+        />
+
+        <!-- Secret Question -->
+        <label for="secretQuestion">Secret Question</label>
+        <select id="secretQuestion" required>
+          <option value="">-- Select a Secret Question --</option>
+          <option value="What is your pet's name?">What is your pet's name?</option>
+          <option value="What city were you born in?">What city were you born in?</option>
+          <option value="What is your favorite food?">What is your favorite food?</option>
+          <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+          <option value="What was the name of your first school?">What was the name of your first school?</option>
+        </select>
+
+        <!-- Secret Answer -->
+        <label for="secretAnswer">Your Answer</label>
+        <input
+          type="text"
+          id="secretAnswer"
+          placeholder="Enter your secret answer"
           required
         />
 

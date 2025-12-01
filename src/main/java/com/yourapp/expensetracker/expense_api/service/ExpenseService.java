@@ -209,7 +209,7 @@ public class ExpenseService {
     //     return expenseRepository.save(newExpense);
     // }
     // 
-    // public List<Expense> getExpensesForUser(Long userId) {
-    //     return expenseRepository.findByUserId(userId);
-    // }
+    public List<Expense> getExpensesByUserId(Long userId) {
+         return expenseRepository.findByUserId(userId);
+    }
 }

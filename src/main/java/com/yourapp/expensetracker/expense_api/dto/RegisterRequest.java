@@ -27,14 +27,22 @@ public class RegisterRequest {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
+    @NotBlank(message = "Secret question is required")
+    private String secretQuestion;
+
+    @NotBlank(message = "Secret answer is required")
+    private String secretAnswer;
+
     public RegisterRequest() {
     }
 
-    public RegisterRequest(String username, String email, String password, String fullName) {
+    public RegisterRequest(String username, String email, String password, String fullName, String secretQuestion, String secretAnswer) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.fullName = fullName;
+        this.secretQuestion = secretQuestion;
+        this.secretAnswer = secretAnswer;
     }
 
     public String getUsername() {
@@ -67,5 +75,21 @@ public class RegisterRequest {
 
     public void setfullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public String getSecretQuestion() {
+        return secretQuestion;
+    }
+
+    public void setSecretQuestion(String secretQuestion) {
+        this.secretQuestion = secretQuestion;
+    }
+
+    public String getSecretAnswer() {
+        return secretAnswer;
+    }
+
+    public void setSecretAnswer(String secretAnswer) {
+        this.secretAnswer = secretAnswer;
     }
 }

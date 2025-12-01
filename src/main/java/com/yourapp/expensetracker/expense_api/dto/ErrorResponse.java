@@ -20,6 +20,7 @@ public class ErrorResponse {
     public ErrorResponse() {
         this.timestamp = LocalDateTime.now();
         this.details = new ArrayList<>();
+
     }
 
     public ErrorResponse(int status, String error, String message, String path) {
@@ -28,6 +29,11 @@ public class ErrorResponse {
         this.error = error;
         this.message = message;
         this.path = path;
+    }
+
+    public ErrorResponse(String message) {
+        this.timestamp = LocalDateTime.now();
+        this.message = message;
     }
 
     // Getters and Setters
