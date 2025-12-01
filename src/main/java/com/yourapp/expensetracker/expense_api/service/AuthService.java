@@ -63,7 +63,9 @@ public class AuthService {
                     request.getEmail(),
                     request.getPassword(),
                     request.getfullName(),
-                    "USER"
+                    "USER",
+                    request.getSecretQuestion(),
+                    request.getSecretAnswer()
             );
 
             logger.debug("User created with ID: {}", user.getId());
@@ -182,6 +184,32 @@ public class AuthService {
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);
     }
+
+    public String getSecretQuestionByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("No user found with that email"));
+
+        if (user.getSecretQuestion() == null || user.getSecretQuestion().isEmpty()) {
+            throw new RuntimeException("User did not set a secret question");
+        }
+
+        return user.getSecretQuestion();
+    }
+
+    public void verifySecretAnswerAndResetPassword(String email, String answer, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("No user found with that email"));
+
+        // Compare hashed values
+        if (!passwordEncoder.matches(answer, user.getSecretAnswerHash())) {
+            throw new RuntimeException("Secret answer is incorrect");
+        }
+
+        // Update password
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
 
     /**
      * Get currently authenticated user from security context

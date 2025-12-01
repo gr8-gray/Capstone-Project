@@ -161,14 +161,14 @@ async function authenticatedFetch(url, options = {}) {
 }
 
   // ===== AUTH API CALLS =====
-  async function register(firstName, lastName, username, email, password) {
+  async function register(firstName, lastName, username, email, password, secretQuestion, secretAnswer) {
     log(LOG_LEVELS.INFO, `Attempting to register user: ${username}`);
 
     try {
       const response = await fetch(`${AUTH_API_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, username, email, password }),
+        body: JSON.stringify({ firstName, lastName, username, email, password, secretQuestion, secretAnswer}),
       });
 
       // Safely parse JSON

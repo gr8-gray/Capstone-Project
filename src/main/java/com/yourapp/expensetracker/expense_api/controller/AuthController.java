@@ -7,18 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.yourapp.expensetracker.expense_api.dto.AuthResponse;
-import com.yourapp.expensetracker.expense_api.dto.LoginRequest;
-import com.yourapp.expensetracker.expense_api.dto.RegisterRequest;
-import com.yourapp.expensetracker.expense_api.dto.UserDTO;
+import com.yourapp.expensetracker.expense_api.dto.*;
 import com.yourapp.expensetracker.expense_api.model.User;
 import com.yourapp.expensetracker.expense_api.service.AuthService;
 import com.yourapp.expensetracker.expense_api.service.UserService;
@@ -30,6 +21,7 @@ import jakarta.validation.Valid;
  * Handles user registration and login
  * @author Eric Gray - Backend Developer
  */
+
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
@@ -46,96 +38,46 @@ public class AuthController {
         this.userService = userService;
     }
 
-    /**
-     * Register a new user
-     * POST /api/auth/register
-     */
+    // ---------------- REGISTER -------------------
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody RegisterRequest request) {
-        logger.info("Registration attempt for username: {}, email: {}", request.getUsername(), request.getEmail());
         try {
             AuthResponse response = authService.register(request);
-            logger.info("User registered successfully: {}", request.getUsername());
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
-            logger.warn("Registration failed - validation error: {}", e.getMessage());
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         } catch (Exception e) {
-            logger.error("Registration failed for username: {} - {}", request.getUsername(), e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("message", e.getMessage()));
         }
     }
 
-    /**
-     * Login user
-     * POST /api/auth/login
-     */
+    // ---------------- LOGIN -------------------
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
-        
-        logger.info("Login attempt for user: {}", request.getUsernameOrEmail());
         try {
             AuthResponse response = authService.login(request);
-            logger.info("User logged in successfully: {}", request.getUsernameOrEmail());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            logger.warn("Login failed for user: {} - {}", request.getUsernameOrEmail(), e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid username/email or password"));
         }
     }
 
-
-    /**
-     * Get current user profile
-     * GET /api/auth/me
-     */
+    // ---------------- CURRENT USER -------------------
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser() {
-        logger.debug("Fetching current user profile");
         try {
             User user = authService.getCurrentUser();
             UserDTO userDTO = userService.convertToDTO(user);
-            logger.debug("Current user profile retrieved: {}", user.getUsername());
             return ResponseEntity.ok(userDTO);
         } catch (Exception e) {
-            logger.warn("Failed to get current user profile: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Not authenticated"));
         }
     }
-    /**
-     * Reset Password
-     */
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String email) {
-        logger.info("Password reset requested for email: {}", email);
-
-        try {
-            authService.resetPassword(email);
-            logger.info("Temporary password set for email: {}", email);
-
-            return ResponseEntity.ok(
-                Map.of("message", "Temporary password has been set: Temp@1234")
-            );
-
-        } catch (RuntimeException e) {
-        
-            logger.warn("Password reset failed for {}: {}", email, e.getMessage());
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            logger.error("Unexpected error during password reset for {}: {}", email, e.getMessage(), e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Unexpected server error"));
-        }
-    }
-
+    // ---------------- CHANGE PASSWORD -------------------
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> payload) {
 
@@ -146,34 +88,53 @@ public class AuthController {
             authService.changePassword(oldPassword, newPassword);
             return ResponseEntity.ok(Map.of("message", "Password updated successfully"));
         } catch (RuntimeException e) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        }
     }
-}
 
-    /**
-     * Logout (client-side token removal)
-     * POST /api/auth/logout
-     */
+    // -----------------------------------------------------
+    //       PASSWORD RESET USING SECRET QUESTION
+    // -----------------------------------------------------
+
+    // STEP 1 → Ask for the user's email, return their secret question
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        try {
+            String question = authService.getSecretQuestionByEmail(request.getEmail());
+            return ResponseEntity.ok(new SecretQuestionResponse(question));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+        }
+    }
+
+    // STEP 2 → User submits answer + new password
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            authService.verifySecretAnswerAndResetPassword(
+                    request.getEmail(),
+                    request.getAnswer(),
+                    request.getNewPassword()
+            );
+            return ResponseEntity.ok(new MessageResponse("Password updated successfully."));
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(new ErrorResponse(ex.getMessage()));
+        }
+    }
+
+    // ---------------- LOGOUT -------------------
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-        // JWT is stateless, so logout is handled client-side by removing the token
         return ResponseEntity.ok(Map.of("message", "Logged out successfully"));
     }
 
-    /**
-     * Check if username exists
-     * GET /api/auth/check-username?username=...
-     */
+    // ---------------- CHECK USERNAME/EMAIL -------------------
     @GetMapping("/check-username")
     public ResponseEntity<?> checkUsername(@RequestParam String username) {
         boolean exists = userService.getUserByUsername(username).isPresent();
         return ResponseEntity.ok(Map.of("exists", exists));
     }
 
-    /**
-     * Check if email exists
-     * GET /api/auth/check-email?email=...
-     */
     @GetMapping("/check-email")
     public ResponseEntity<?> checkEmail(@RequestParam String email) {
         boolean exists = userService.getUserByEmail(email).isPresent();

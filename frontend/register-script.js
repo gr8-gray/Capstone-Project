@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const emailInput = document.getElementById("email");
   const passwordInput = document.getElementById("password");
   const confirmPasswordInput = document.getElementById("confirm-password");
-
+  
   // Real-time username availability check
   // (Disabled for now: we only check on submit to avoid weird behavior)
   // let usernameCheckTimeout;
@@ -42,6 +42,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const email = emailInput.value.trim();
     const password = passwordInput.value;
     const confirmPassword = confirmPasswordInput.value;
+    const secretQuestion = document.getElementById("secretQuestion").value.trim();
+    const secretAnswer = document.getElementById("secretAnswer").value.trim();
+
 
     // Form Validation
     if (!firstName || !lastName || !username || !email || !password || !confirmPassword) {
@@ -64,6 +67,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    if (!secretQuestion || !secretAnswer) {
+      alert("Please select a secret question and enter the answer.");
+      return;
+    }
+
     // Show loading state
     const submitButton = registerForm.querySelector('button[type="submit"]');
     const originalText = submitButton.textContent;
@@ -73,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       // Calls register() in auth.js
-      const authResponse = await register(firstName, lastName, username, email, password);
+      const authResponse = await register(firstName, lastName, username, email, password, secretQuestion, secretAnswer);
 
       console.log("Register response:", authResponse);
 

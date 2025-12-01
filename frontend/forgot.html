@@ -14,7 +14,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Reset Password</title>
+<title>Forgot Password</title>
 
 <style>
     body {
@@ -43,7 +43,7 @@
         font-size: 22px;
     }
 
-    input[type="email"] {
+    input {
         width: 100%;
         padding: 12px;
         margin-bottom: 15px;
@@ -74,13 +74,8 @@
         font-weight: bold;
     }
 
-    .message.success {
-        color: green;
-    }
-
-    .message.error {
-        color: red;
-    }
+    .message.success { color: green; }
+    .message.error { color: red; }
 
     a {
         display: block;
@@ -101,54 +96,29 @@
 <div class="reset-container">
     <h2>Forgot Password</h2>
 
-    <input id="emailInput" type="email" placeholder="Enter your email" />
+    <!-- STEP 1: Enter Email -->
+    <div id="step1">
+        <input id="emailInput" type="email" placeholder="Enter your email" />
+        <button class="btn" onclick="requestSecretQuestion()">Next</button>
+        <div id="messageBox" class="message"></div>
+    </div>
 
-    <button class="btn" onclick="resetPassword()">Reset Password</button>
+    <!-- STEP 2: Answer Secret Question + New Password -->
+    <div id="step2" style="display:none;">
+        <p id="questionBox" style="font-weight:bold;margin-bottom:10px;"></p>
 
-    <div id="messageBox" class="message"></div>
+        <input id="secretAnswerInput" type="text" placeholder="Your answer" />
+        <input id="newPassInput" type="password" placeholder="New password" />
+
+        <button class="btn" onclick="submitNewPassword()">Reset Password</button>
+
+        <div id="messageBox2" class="message"></div>
+    </div>
 
     <a href="login.html">← Back to Login</a>
 </div>
 
-<script>
-async function resetPassword() {
-    const email = document.getElementById("emailInput").value.trim();
-    const msgBox = document.getElementById("messageBox");
-
-    msgBox.textContent = "";
-    msgBox.className = "message";
-
-    if (!email) {
-        msgBox.textContent = "Please enter your email.";
-        msgBox.classList.add("error");
-        return;
-    }
-
-    try {
-        const response = await fetch(
-            "http://localhost:8080/api/auth/reset-password?email=" + encodeURIComponent(email),
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" }
-            }
-        );
-
-        const data = await response.json();
-
-        if (response.ok) {
-            msgBox.textContent = data.message;
-            msgBox.classList.add("success");
-        } else {
-            msgBox.textContent = data.error || "Something went wrong.";
-            msgBox.classList.add("error");
-        }
-
-    } catch (error) {
-        msgBox.textContent = "Server error. Try again later.";
-        msgBox.classList.add("error");
-    }
-}
-</script>
+<script src="forgot.js"></script>
 
 </body>
 </html>

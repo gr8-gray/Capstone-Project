@@ -39,7 +39,8 @@ public class UserService {
     /**
      * Create a new user
      */
-    public User createUser(String username, String email, String password, String fullName, String role) {
+    public User createUser(String username, String email, String password, String fullName, String role, String secretQuestion,
+        String secretAnswer) {
         logger.info("Attempting to create user with username: {}", username);
         
         // Check if username already exists
@@ -63,6 +64,9 @@ public class UserService {
         user.setFirstName(fullName);
         user.setLastName("");
         user.setActive(true);
+        user.setSecretQuestion(secretQuestion);
+        user.setSecretAnswerHash(passwordEncoder.encode(secretAnswer));
+
 
         User savedUser = userRepository.save(user);
         logger.info("Successfully created user with ID: {} and username: {}", 
