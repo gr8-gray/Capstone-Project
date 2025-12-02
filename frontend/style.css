@@ -1,0 +1,450 @@
+﻿/* 
+ * ================================================================
+ * SMART EXPENSE TRACKER – Frontend Stylesheet
+ * Author: Pukar Adhikari (Frontend Developer / Tester)
+ * Date Modified: November 2025
+ *
+ * Description:
+ * Contains styling for login, registration, dashboard, tables,
+ * buttons, and responsive layouts. Ensures consistent UI design
+ * across all pages of the application.
+ * ================================================================
+ */
+
+body {
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #eef2f3, #8e9eab);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* ======= HEADER ======= */
+/* Styles header background, title, and navigation links */
+
+header h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+
+header {
+  background-color: #007acc;
+  color: white;
+  width: 100%;
+  padding: 20px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.header-left h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 1px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    padding-right: 20px;   
+}
+
+.header-right a {
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  transition: opacity 0.2s ease;
+}
+
+.header-right a:hover {
+  opacity: 0.7;
+}
+
+.divider {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+  header {
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .header-right {
+    gap: 8px;
+    font-size: 14px;
+  }
+}
+
+/* Limit width of header content and center it */
+.header-container {
+    width: 95%;
+    max-width: 1200px; /* adjust to fit your design */
+    margin: 0 auto; /* centers the entire header content */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header nav a:hover {
+  color: #ffd166; /* gold hover accent */
+}
+
+/* ======= MAIN CONTENT ======= */
+/* Core dashboard container */
+main {
+  background: white;
+  width: 95%;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* ======= SECTION TITLES ======= */
+h2 {
+  color: #007acc;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 8px;
+  margin-bottom: 15px;
+}
+
+/* ======= FORM ======= */
+/* Layout for add expense form */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Input styles for text and numeric fields */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+select {
+  flex: 1;
+  min-width: 160px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+#expense-form {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+#expense-form button {
+  grid-column: span 1;
+  justify-self: end;
+  padding: 12px 25px;
+}
+
+/* Focus effect for input fields */
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #007acc;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.5);
+}
+
+/* Standard button styles */
+button {
+  background-color: #007acc;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005ea1;
+}
+
+/* ======= TABLE ======= */
+/* Expense table layout */
+.table-wrapper {
+  width: 100%;
+  max-height: 350px;     /* height of scroll area */
+  overflow-y: auto;      /* enable vertical scroll */
+  overflow-x: auto;      /* still allow horizontal if needed */
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  border: 2px solid #ccc;
+}
+
+/* Table header styling */
+thead {
+  background-color: #007acc;
+  color: white;
+}
+thead th {
+  position: sticky;
+  top: 0;
+  background-color: #007acc;
+  color: #fff;
+  z-index: 5;
+}
+
+/* Table cells */
+th, td {
+  padding: 12px 10px;
+  border: 1px solid #ccc;
+  word-wrap: break-word;
+  vertical-align: top;
+}
+
+/* Zebra striping and hover highlight */
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+tbody tr:hover {
+  background-color: #e6f2ff;
+  cursor: pointer;
+}
+
+/* ======= TOTAL ROW ======= */
+/* Style for table footer showing total */
+tfoot {
+  background-color: #f1f1f1;
+  font-weight: bold;
+  font-size: 16px;
+  border-top: 3px solid #007acc;
+}
+
+tfoot td {
+  padding: 14px;
+  text-align: right;
+  color: #333;
+}
+
+/* ======= EDIT / DELETE BUTTONS ======= */
+
+.edit-btn {
+  background: #ffcc00;
+  color: #000;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.edit-btn:hover {
+  background: #d8b100;
+}
+
+.delete-btn {
+  background: #ff4d4d;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.delete-btn:hover {
+  background: #d93636;
+}
+
+.save-btn {
+  background: #4caf50 !important;
+  color: #fff !important;
+}
+
+/* ======= AUTH PAGES (Login / Register) ======= */
+
+.auth-body {
+  background: linear-gradient(135deg, #8e9eab, #eef2f3);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.auth-container {
+  background: white;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  width: min(95%, 420px);
+  text-align: center;
+}
+
+.auth-container h1 {
+  color: #007acc;
+  margin-bottom: 25px;
+  font-size: 26px;
+}
+
+.auth-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-container label {
+  text-align: left;
+  color: #444;
+  font-weight: 500;
+}
+
+.auth-container input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.auth-container input:focus {
+  border-color: #007acc;
+  box-shadow: 0 0 5px rgba(0, 122, 204, 0.4);
+}
+
+.btn-primary {
+  background-color: #007acc;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #005ea1;
+}
+
+.link-register {
+  color: #007acc;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.link-register:hover {
+  text-decoration: underline;
+}
+
+/* ======= SECONDARY BUTTON ======= */
+
+.btn-secondary {
+  background-color: #00bcd4;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.btn-secondary:hover {
+  background-color: #0097a7;
+}
+
+/* ======= CHART SECTION ======= */
+
+#summary,
+#monthly {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Reduce chart height and keep it proportional */
+#categoryChart,
+#monthlyChart {
+    max-height: 280px !important;
+    height: 280px !important;
+    width: 100% !important;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Reduce spacing around the entire chart section */
+#chartSection {
+    padding: 10px 0;
+    margin-top: 10px;
+}
+
+
+canvas {
+  max-width: 100%;
+  margin-top: 10px;
+}
+
+/* ======= RESPONSIVE BREAKPOINTS ======= */
+
+@media (max-width: 768px) {
+  form {
+    flex-direction: column;
+  }
+
+  table {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 500px) {
+  header h1 {
+    font-size: 20px;
+  }
+
+  main {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .auth-container {
+    padding: 20px;
+  }
+
+  .edit-btn,
+  .delete-btn {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+
+  .table-wrapper {
+    overflow-x: auto;
+  }
+}
+@media (max-width: 480px) {
+  main {
+    width: 92%;
+    padding: 15px 18px; /*  less edge-to-edge */
+  }
+
+  #expense-form input,
+  #expense-form select {
+    flex: 1 1 100%; /*  inputs full line on mobile */
+  }
+
+  #expense-form button {
+    grid-column: 1 / -1;
+    width: 100%;     /*  button full width on mobile */
+    margin-left: 0;  
+    justify-self: center;
+  }
+}

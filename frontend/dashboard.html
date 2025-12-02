@@ -1,0 +1,132 @@
+﻿<!--
+  ================================================================
+  SMART EXPENSE TRACKER – Frontend UI Component
+  Author: Pukar Adhikari (Frontend Developer / Tester)
+  Date Modified: November 2025
+
+  Description:
+  This page is part of the Smart Expense Tracker frontend and
+  provides the user interface for authentication, dashboard usage,
+  and expense tracking features. Layout, UX, and form behavior
+  were implemented and tested by the frontend developer.
+  ================================================================
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Prevent browser caching (fix Back-Button security issue) -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <title>Smart Expense Tracker - Dashboard</title>
+
+  <link rel="stylesheet" href="./style.css" />
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-container">
+        <div class="header-left">
+            <h1>Smart Expense Tracker</h1>
+        </div>
+
+        <div class="header-right">
+            <span id="welcomeUser"></span>
+            <span class="divider">|</span>
+            <a href="#" id="changePasswordLink">Change Password</a>
+            <span class="divider">|</span>
+            <a href="#" id="logoutBtn">Logout</a>
+        </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main>
+
+    <!-- Add Expense -->
+    <section id="add-expense-section">
+      <h2>Add Expense</h2>
+
+      <form id="expense-form">
+        <input type="text" id="expense-name" placeholder="Expense Name" required />
+
+        <select id="expense-category" required>
+          <option value="">Select Category</option>
+          <option value="Food">Food</option>
+          <option value="Transport">Transport</option>
+          <option value="Utilities">Utilities</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Health">Health</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <input type="number" id="expense-amount" placeholder="Amount ($)" step="0.01" min="0" required/>
+        <input type="date" id="expense-date" required />
+
+        <button type="button" id = "addBtn">Add</button>
+      </form>
+    </section>
+
+    <!-- Expense History -->
+    <section id="expense-history">
+      <h2>Expense History</h2>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Amount ($)</th>
+              <th>Date</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+
+          <tfoot>
+            <tr>
+              <td><strong>Total</strong></td>
+              <td colspan="4"><strong id="total-cell">$0.00</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div style="text-align:center;margin-top:20px;">
+        <button id="viewReportBtn" class="btn-secondary">📊 View Reports</button>
+      </div>
+
+      <div id="chartSection" style="display:none;margin-top:30px;">
+        <h2>Expense Insights</h2>
+
+        <div style="text-align:center;margin-bottom:15px;">
+          <label for="monthFilter">Select Month:</label>
+          <select id="monthFilter">
+            <option value="all">All Months</option>
+          </select>
+        </div>
+
+        <canvas id="categoryChart"></canvas>
+        <canvas id="monthlyChart" style="margin-top:30px;"></canvas>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- LIBS -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- AUTH MUST LOAD FIRST -->
+  <script src="./auth.js"></script>
+
+  <!-- MAIN DASHBOARD LOGIC -->
+  <script src="./script.js"></script>
+
+</body>
+</html>
