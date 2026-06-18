@@ -1,8 +1,11 @@
 package com.yourapp.expensetracker.expense_api.service;
 
+import com.yourapp.expensetracker.expense_api.event.ExpenseEvent;
 import com.yourapp.expensetracker.expense_api.exception.ResourceNotFoundException;
+import com.yourapp.expensetracker.expense_api.messaging.ExpenseEventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +17,11 @@ import com.yourapp.expensetracker.expense_api.model.Expense;
 import com.yourapp.expensetracker.expense_api.model.User;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Service layer for Expense business logic
@@ -32,11 +37,14 @@ public class ExpenseService {
 
     private final ExpenseRepository expenseRepository;
     private final AuthService authService;
+    private final ObjectProvider<ExpenseEventPublisher> eventPublisher;
 
     @Autowired
-    public ExpenseService(ExpenseRepository expenseRepository, AuthService authService) {
+    public ExpenseService(ExpenseRepository expenseRepository, AuthService authService,
+                          ObjectProvider<ExpenseEventPublisher> eventPublisher) {
         this.expenseRepository = expenseRepository;
         this.authService = authService;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -48,6 +56,7 @@ public class ExpenseService {
         validateExpense(expense);
         Expense savedExpense = expenseRepository.save(expense);
         logger.info("Successfully created expense with ID: {}", savedExpense.getId());
+        publishEvent(savedExpense, ExpenseEvent.EventType.EXPENSE_CREATED);
         return savedExpense;
     }
 
@@ -102,6 +111,7 @@ public class ExpenseService {
             validateExpense(expense);
             Expense saved = expenseRepository.save(expense);
             logger.info("Successfully updated expense with ID: {}", id);
+            publishEvent(saved, ExpenseEvent.EventType.EXPENSE_UPDATED);
             return saved;
         } else {
             logger.error("Failed to update expense - ID not found: {}", id);
@@ -231,6 +241,30 @@ public class ExpenseService {
     @Transactional(readOnly = true)
     public List<Expense> getExpensesByUserIdAndAmountRange(Long userId, BigDecimal minAmount, BigDecimal maxAmount) {
         return expenseRepository.findByUserIdAndAmountBetween(userId, minAmount, maxAmount);
+    }
+
+    /**
+     * Publish an expense domain event to Kafka via the Spring Integration gateway.
+     * No-op when eventing is disabled (e.g. the test profile) — the gateway bean
+     * is simply absent, so {@link ObjectProvider#ifAvailable} skips publishing.
+     */
+    private void publishEvent(Expense expense, ExpenseEvent.EventType type) {
+        eventPublisher.ifAvailable(publisher -> {
+            Long userId = expense.getUser() != null ? expense.getUser().getId() : null;
+            ExpenseEvent event = new ExpenseEvent(
+                    UUID.randomUUID().toString(),
+                    type,
+                    expense.getId(),
+                    userId,
+                    expense.getDescription(),
+                    expense.getAmount(),
+                    expense.getCategory(),
+                    expense.getDate(),
+                    Instant.now()
+            );
+            publisher.publish(event);
+            logger.info("Published {} event for expense ID {} (user {})", type, expense.getId(), userId);
+        });
     }
 
     /**

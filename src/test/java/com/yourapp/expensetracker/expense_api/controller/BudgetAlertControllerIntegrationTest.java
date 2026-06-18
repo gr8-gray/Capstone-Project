@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -211,15 +212,13 @@ class BudgetAlertControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void shouldRequireAuthenticationForProtectedEndpoints() throws Exception {
-        // Clear security context to simulate unauthenticated request
-        org.springframework.security.core.context.SecurityContextHolder.clearContext();
-        
-        // When: Try to access without token
-        // Spring Security 6.x returns 403 (Forbidden) when CSRF is disabled
-        mockMvc.perform(post("/api/budget-alerts/check-all"))
+        // As an anonymous user (no JWT) protected endpoints must be rejected.
+        // .with(anonymous()) pins the request's security context regardless of any
+        // ambient test context. Spring Security 6.x returns 403 when CSRF is disabled.
+        mockMvc.perform(post("/api/budget-alerts/check-all").with(anonymous()))
                 .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/budget-alerts/unread"))
+        mockMvc.perform(get("/api/budget-alerts/unread").with(anonymous()))
                 .andExpect(status().isForbidden());
     }
 

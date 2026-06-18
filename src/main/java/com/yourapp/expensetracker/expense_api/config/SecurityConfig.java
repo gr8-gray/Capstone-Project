@@ -16,11 +16,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 import java.util.Arrays;
 
@@ -38,36 +36,33 @@ public class SecurityConfig {
     private ApplicationContext applicationContext;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
-        MvcRequestMatcher.Builder mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // FRONTEND FILES
-                .requestMatchers(mvcMatcherBuilder.pattern("/")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/index.html")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/frontend/**")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/login.html")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/register.html")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/dashboard.html")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/style.css")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/auth.js")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/login.js")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/register-script.js")).permitAll()
-                .requestMatchers(mvcMatcherBuilder.pattern("/script.js")).permitAll()
+                // FRONTEND FILES (when served statically)
+                .requestMatchers("/", "/index.html", "/frontend/**",
+                        "/login.html", "/register.html", "/dashboard.html", "/change_password.html", "/forgot.html",
+                        "/style.css", "/auth.js", "/login.js", "/register-script.js", "/script.js", "/forgot.js")
+                    .permitAll()
 
                 // AUTH API
-                .requestMatchers(mvcMatcherBuilder.pattern("/api/auth/**")).permitAll()
+                .requestMatchers("/api/auth/**").permitAll()
+
+                // API DOCS + HEALTH
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**",
+                        "/actuator/health", "/actuator/info").permitAll()
 
                 // PROTECTED APIS
-                .requestMatchers(mvcMatcherBuilder.pattern("/api/expenses/**")).authenticated()
-                .requestMatchers(mvcMatcherBuilder.pattern("/api/budgets/**")).authenticated()
-                .requestMatchers(mvcMatcherBuilder.pattern("/api/reports/**")).authenticated()
-                .requestMatchers(mvcMatcherBuilder.pattern("/api/budget-alerts/**")).authenticated()
-                .requestMatchers(mvcMatcherBuilder.pattern("/api/categories/**")).authenticated()
+                .requestMatchers(
+                        "/api/expenses/**",
+                        "/api/budgets/**",
+                        "/api/reports/**",
+                        "/api/budget-alerts/**",
+                        "/api/categories/**")
+                    .authenticated()
 
                 .anyRequest().permitAll()
             )
