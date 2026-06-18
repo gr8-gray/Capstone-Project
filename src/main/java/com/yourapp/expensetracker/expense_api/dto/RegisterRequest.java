@@ -6,7 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 /**
- * DTO for user registration requests
+ * DTO for user registration requests.
+ * Carries first/last name separately to match the User entity and the
+ * frontend registration form.
  * @author Eric Gray - Backend Developer
  */
 public class RegisterRequest {
@@ -16,7 +18,11 @@ public class RegisterRequest {
     @NoSqlInjection(message = "Username contains invalid characters")
     private String username;
 
-    private String fullName;
+    @Size(max = 50, message = "First name must not exceed 50 characters")
+    private String firstName;
+
+    @Size(max = 50, message = "Last name must not exceed 50 characters")
+    private String lastName;
 
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be valid")
@@ -30,11 +36,12 @@ public class RegisterRequest {
     public RegisterRequest() {
     }
 
-    public RegisterRequest(String username, String email, String password, String fullName) {
+    public RegisterRequest(String username, String email, String password, String firstName, String lastName) {
         this.username = username;
         this.email = email;
         this.password = password;
-        this.fullName = fullName;
+        this.firstName = firstName;
+        this.lastName = lastName;
     }
 
     public String getUsername() {
@@ -61,11 +68,19 @@ public class RegisterRequest {
         this.password = password;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

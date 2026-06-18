@@ -2,6 +2,7 @@ package com.yourapp.expensetracker.expense_api.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yourapp.expensetracker.expense_api.validation.NoSqlInjection;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -55,8 +56,9 @@ public class User {
     private String email;
 
     /**
-     * BCrypt-hashed password.
+     * BCrypt-hashed password. Never serialized to API responses.
      */
+    @JsonIgnore
     @Column(name = "password_hash", nullable = false, length = 255)
     private String passwordHash;
 

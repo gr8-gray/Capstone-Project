@@ -4,8 +4,9 @@
 
 A full-stack web application for personal expense management with JWT authentication, budget monitoring, and comprehensive security features. Developed as a capstone project for CMSC 495 at the University of Maryland Global Campus.
 
-[![Java](https://img.shields.io/badge/Java-17-orange)]()
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green)]()
+[![CI](https://github.com/gr8-gray/Capstone-Project/actions/workflows/ci.yml/badge.svg)](https://github.com/gr8-gray/Capstone-Project/actions/workflows/ci.yml)
+[![Java](https://img.shields.io/badge/Java-21-orange)]()
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.15-green)]()
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue)]()
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue)]()
 [![Tests](https://img.shields.io/badge/Tests-155%2F155%20Passing-brightgreen)]()

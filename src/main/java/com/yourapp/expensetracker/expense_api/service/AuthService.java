@@ -62,7 +62,8 @@ public class AuthService {
                     request.getUsername(),
                     request.getEmail(),
                     request.getPassword(),
-                    request.getFullName(),
+                    request.getFirstName(),
+                    request.getLastName(),
                     "USER"
             );
 

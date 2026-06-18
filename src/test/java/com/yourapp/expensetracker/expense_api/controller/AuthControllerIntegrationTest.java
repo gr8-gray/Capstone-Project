@@ -41,7 +41,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         request.setUsername("newuser");
         request.setEmail("newuser@example.com");
         request.setPassword("password123");
-        request.setFullName("New User");
+        request.setFirstName("New");
+        request.setLastName("User");
 
         // When & Then
         mockMvc.perform(post("/api/auth/register")
@@ -223,7 +224,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         request.setUsername(uniqueUsername);
         request.setEmail("test_" + System.currentTimeMillis() + "@example.com");
         request.setPassword("password123");
-        request.setFullName("Test User");
+        request.setFirstName("Test");
+        request.setLastName("User");
 
         // When: Register user
         mockMvc.perform(post("/api/auth/register")
@@ -245,7 +247,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         request.setUsername(uniqueUsername);
         request.setEmail("test_" + System.currentTimeMillis() + "@example.com");
         request.setPassword("password123");
-        request.setFullName("Test User");
+        request.setFirstName("Test");
+        request.setLastName("User");
 
         // When: Register user
         mockMvc.perform(post("/api/auth/register")
@@ -312,7 +315,8 @@ class AuthControllerIntegrationTest extends BaseIntegrationTest {
         request.setUsername("testuser_" + System.currentTimeMillis());
         request.setEmail("test_" + System.currentTimeMillis() + "@example.com");
         request.setPassword("password123");
-        request.setFullName("Test User");
+        request.setFirstName("Test");
+        request.setLastName("User");
 
         // When: Register user
         String response = mockMvc.perform(post("/api/auth/register")
