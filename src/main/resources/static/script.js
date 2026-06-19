@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ===== API BASE =====
-  const API_BASE_URL = "http://localhost:8080/api/expenses";
+  const API_BASE_URL = "/api/expenses";
 
   // ===== DATE FIXERS =====
   function toLocalDate(dateStr) {

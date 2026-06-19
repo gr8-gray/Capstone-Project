@@ -13,8 +13,8 @@
  * ================================================================
  */
 
-const AUTH_API_URL = "http://localhost:8080/api/auth";
-const API_BASE_URL = "http://localhost:8080/api";
+const AUTH_API_URL = "/api/auth";
+const API_BASE_URL = "/api";
 
 // ===== LOGGING UTILITY =====
 const LOG_LEVELS = {

@@ -1,0 +1,38 @@
+# Fly.io config — web service (Spring Boot API + bundled static frontend).
+# Companion internal-only apps (provisioned separately, reachable over Fly 6PN):
+#   - dicks-expense-mysql.internal:3306   (MySQL 8)
+#   - dicks-expense-kafka.internal:9092   (Kafka KRaft single broker)
+# Secrets (set via `fly secrets set`): DB_URL, DB_USERNAME, DB_PASSWORD,
+#   KAFKA_BOOTSTRAP_SERVERS, JWT_SECRET. APP_EVENTS_ENABLED=true keeps the
+#   full publish->consume->alert loop live in prod.
+app = "dicks-expense-tracker"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  APP_EVENTS_ENABLED = "true"
+  EXPENSES_TOPIC = "expenses"
+  EXPENSES_CONSUMER_GROUP = "budget-alert-consumer"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.checks]
+    [http_service.checks.health]
+      method = "GET"
+      path = "/actuator/health"
+      interval = "15s"
+      timeout = "4s"
+      grace_period = "60s"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
