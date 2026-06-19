@@ -1,0 +1,21 @@
+# Fly config — internal-only MySQL 8 (no public service; reachable over 6PN at
+# dicks-expense-mysql.internal:3306). Secrets set via `fly secrets`:
+#   MYSQL_ROOT_PASSWORD, MYSQL_PASSWORD
+app = "dicks-expense-mysql"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  MYSQL_DATABASE = "expense_db"
+  MYSQL_USER = "expense_user"
+
+[mounts]
+  source = "mysql_data"
+  destination = "/var/lib/mysql"
+
+[[vm]]
+  memory = "1gb"
+  cpu_kind = "shared"
+  cpus = 1
