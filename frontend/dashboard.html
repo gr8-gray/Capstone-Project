@@ -1,17 +1,16 @@
-﻿<!--
+<!--
   ================================================================
-  SMART EXPENSE TRACKER – Frontend UI Component
-  Author: Pukar Adhikari (Frontend Developer / Tester)
-  Date Modified: November 2025
+  SMART EXPENSE TRACKER – Dashboard (Redesign 2026)
+  CMSC 495 – Capstone Project
 
-  Description:
-  This page is part of the Smart Expense Tracker frontend and
-  provides the user interface for authentication, dashboard usage,
-  and expense tracking features. Layout, UX, and form behavior
-  were implemented and tested by the frontend developer.
+  VISUAL redesign only. Every id/selector consumed by script.js and
+  auth.js is preserved verbatim:
+    #expense-form #expense-name #expense-category #expense-amount
+    #expense-date #addBtn #table-body #total-cell #welcomeUser
+    #changePasswordLink #logoutBtn #viewReportBtn #chartSection
+    #monthFilter #categoryChart #monthlyChart
   ================================================================
 -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,6 +21,10 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Smart Expense Tracker - Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="./style.css" />
 </head>
@@ -37,7 +40,6 @@
 
         <div class="header-right">
             <span id="welcomeUser"></span>
-            <span class="divider">|</span>
             <a href="#" id="changePasswordLink">Change Password</a>
             <span class="divider">|</span>
             <a href="#" id="logoutBtn">Logout</a>
@@ -49,31 +51,41 @@
   <main>
 
     <!-- Add Expense -->
-    <section id="add-expense-section">
+    <section id="add-expense-section" class="reveal reveal-1">
       <h2>Add Expense</h2>
 
       <form id="expense-form">
-        <input type="text" id="expense-name" placeholder="Expense Name" required />
+        <input type="text" id="expense-name" placeholder="Expense name" required />
 
         <select id="expense-category" required>
-          <option value="">Select Category</option>
-          <option value="Food">Food</option>
-          <option value="Transport">Transport</option>
-          <option value="Utilities">Utilities</option>
+          <option value="">Select category</option>
+          <option value="Food &amp; Dining">Food &amp; Dining</option>
+          <option value="Transportation">Transportation</option>
+          <option value="Shopping">Shopping</option>
           <option value="Entertainment">Entertainment</option>
-          <option value="Health">Health</option>
+          <option value="Bills &amp; Utilities">Bills &amp; Utilities</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Education">Education</option>
+          <option value="Travel">Travel</option>
+          <option value="Home &amp; Garden">Home &amp; Garden</option>
+          <option value="Personal Care">Personal Care</option>
+          <option value="Insurance">Insurance</option>
+          <option value="Investments">Investments</option>
+          <option value="Gifts &amp; Donations">Gifts &amp; Donations</option>
+          <option value="Business">Business</option>
+          <option value="Taxes">Taxes</option>
           <option value="Other">Other</option>
         </select>
 
         <input type="number" id="expense-amount" placeholder="Amount ($)" step="0.01" min="0" required/>
         <input type="date" id="expense-date" required />
 
-        <button type="button" id = "addBtn">Add</button>
+        <button type="button" id="addBtn">+ Add Expense</button>
       </form>
     </section>
 
     <!-- Expense History -->
-    <section id="expense-history">
+    <section id="expense-history" class="reveal reveal-2">
       <h2>Expense History</h2>
 
       <div class="table-wrapper">
@@ -98,22 +110,30 @@
         </table>
       </div>
 
-      <div style="text-align:center;margin-top:20px;">
-        <button id="viewReportBtn" class="btn-secondary">📊 View Reports</button>
+      <div class="report-bar">
+        <button id="viewReportBtn" class="btn-secondary">View Reports</button>
       </div>
 
-      <div id="chartSection" style="display:none;margin-top:30px;">
+      <div id="chartSection" style="display:none;">
         <h2>Expense Insights</h2>
 
-        <div style="text-align:center;margin-bottom:15px;">
-          <label for="monthFilter">Select Month:</label>
+        <div class="month-filter-bar">
+          <label for="monthFilter">Select month</label>
           <select id="monthFilter">
             <option value="all">All Months</option>
           </select>
         </div>
 
-        <canvas id="categoryChart"></canvas>
-        <canvas id="monthlyChart" style="margin-top:30px;"></canvas>
+        <div class="chart-grid">
+          <div class="chart-card">
+            <h3>Spending by Category</h3>
+            <canvas id="categoryChart"></canvas>
+          </div>
+          <div class="chart-card">
+            <h3>Monthly Totals</h3>
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
       </div>
 
     </section>
@@ -121,6 +141,17 @@
 
   <!-- LIBS -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Theme Chart.js defaults to match the dark UI (decorative; safe if Chart absent) -->
+  <script>
+    if (window.Chart) {
+      Chart.defaults.color = "#aab3cf";
+      Chart.defaults.font.family = "'Manrope', sans-serif";
+      Chart.defaults.borderColor = "rgba(255,255,255,0.08)";
+      Chart.defaults.plugins.legend.labels.usePointStyle = true;
+      Chart.defaults.plugins.legend.labels.padding = 16;
+    }
+  </script>
 
   <!-- AUTH MUST LOAD FIRST -->
   <script src="./auth.js"></script>

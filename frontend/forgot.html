@@ -1,12 +1,10 @@
 <!--
   ===============================================================
-  SMART EXPENSE TRACKER – LOGIN PAGE
+  SMART EXPENSE TRACKER – FORGOT PASSWORD (Redesign 2026)
   CMSC 495 – Capstone Project
-  Author: Pukar Adhikari (Frontend Developer / Tester)
 
-  Purpose:
-  Displays the forgot password form and connects to the authentication API.
-  Includes email input fields and links to login.
+  Self-contained inline logic preserved verbatim: #emailInput,
+  #messageBox, resetPassword(), and the reset-password endpoint.
   ===============================================================
 -->
 <!DOCTYPE html>
@@ -14,100 +12,28 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Reset Password</title>
+<title>Reset Password - Smart Expense Tracker</title>
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f2f2f2;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-    .reset-container {
-        background: white;
-        width: 350px;
-        padding: 30px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        text-align: center;
-    }
-
-    .reset-container h2 {
-        margin-bottom: 20px;
-        color: #333;
-        font-size: 22px;
-    }
-
-    input[type="email"] {
-        width: 100%;
-        padding: 12px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        font-size: 15px;
-    }
-
-    .btn {
-        width: 100%;
-        padding: 12px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        font-size: 16px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: 0.2s;
-    }
-
-    .btn:hover {
-        background-color: #0056cc;
-    }
-
-    .message {
-        margin-top: 15px;
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    .message.success {
-        color: green;
-    }
-
-    .message.error {
-        color: red;
-    }
-
-    a {
-        display: block;
-        margin-top: 15px;
-        font-size: 14px;
-        color: #007bff;
-        text-decoration: none;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-</style>
+<link rel="stylesheet" href="./style.css" />
 </head>
 
-<body>
+<body class="auth-body">
 
-<div class="reset-container">
+<div class="panel">
+    <div class="auth-brand">SMART EXPENSE TRACKER</div>
     <h2>Forgot Password</h2>
 
     <input id="emailInput" type="email" placeholder="Enter your email" />
 
-    <button class="btn" onclick="resetPassword()">Reset Password</button>
+    <button class="btn-primary" onclick="resetPassword()">Reset Password</button>
 
     <div id="messageBox" class="message"></div>
 
-    <a href="login.html">← Back to Login</a>
+    <a href="login.html">&larr; Back to Login</a>
 </div>
 
 <script>

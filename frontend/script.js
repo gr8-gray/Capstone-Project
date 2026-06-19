@@ -191,7 +191,7 @@ document.addEventListener("DOMContentLoaded", () => {
       nameInput.value = exp.description;
 
       const categorySelect = document.createElement("select");
-      ["Food", "Transport", "Utilities", "Entertainment", "Health", "Other"].forEach((c) => {
+      ["Food & Dining", "Transportation", "Shopping", "Entertainment", "Bills & Utilities", "Healthcare", "Education", "Travel", "Home & Garden", "Personal Care", "Insurance", "Investments", "Gifts & Donations", "Business", "Taxes", "Other"].forEach((c) => {
         const opt = document.createElement("option");
         opt.value = opt.textContent = c;
         if (c === exp.category) opt.selected = true;
@@ -346,24 +346,61 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.categoryChartObj) window.categoryChartObj.destroy();
     if (window.monthlyChartObj) window.monthlyChartObj.destroy();
 
+    // ===== ON-BRAND CHART PALETTE (visual only) =====
+    const PIE_PALETTE = [
+      "#2ee6a6", "#5ea0ff", "#ffc24b", "#9b8cff",
+      "#ff5d73", "#3ad1c2", "#f78fb3", "#ffd66b"
+    ];
+
     // ===== CATEGORY PIE CHART =====
     window.categoryChartObj = new Chart(document.getElementById("categoryChart"), {
-      type: "pie",
+      type: "doughnut",
       data: {
         labels: categoryLabels,
-        datasets: [{ data: categoryAmounts }],
+        datasets: [{
+          data: categoryAmounts,
+          backgroundColor: categoryLabels.map((_, i) => PIE_PALETTE[i % PIE_PALETTE.length]),
+          borderColor: "rgba(10,14,26,0.9)",
+          borderWidth: 3,
+          hoverOffset: 6
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "62%",
+        plugins: { legend: { position: "bottom" } }
       }
     });
 
     // ===== MONTHLY BAR GRAPH =====
+    const barCtx = document.getElementById("monthlyChart").getContext("2d");
+    const barGrad = barCtx.createLinearGradient(0, 0, 0, 300);
+    barGrad.addColorStop(0, "rgba(46,230,166,0.95)");
+    barGrad.addColorStop(1, "rgba(18,184,134,0.35)");
+
     window.monthlyChartObj = new Chart(document.getElementById("monthlyChart"), {
       type: "bar",
       data: {
         labels: monthsOrdered,
         datasets: [{
           label: "Monthly Total ($)",
-          data: monthAmounts
+          data: monthAmounts,
+          backgroundColor: barGrad,
+          borderColor: "#2ee6a6",
+          borderWidth: 1,
+          borderRadius: 8,
+          maxBarThickness: 34
         }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: { grid: { color: "rgba(255,255,255,0.06)" }, beginAtZero: true }
+        }
       }
     });
   }

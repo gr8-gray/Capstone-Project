@@ -1,13 +1,10 @@
-﻿<!--
+<!--
   ===============================================================
-  SMART EXPENSE TRACKER – LOGIN PAGE
+  SMART EXPENSE TRACKER – LOGIN (Redesign 2026)
   CMSC 495 – Capstone Project
-  Author: Pukar Adhikari (Frontend Developer / Tester)
 
-  Purpose:
-  Displays the login form and connects to the authentication API.
-  Includes username/password input fields and links to registration.
-  auth.js and login.js handle validation, token saving, and redirection.
+  JS hooks preserved: #login-form, #username, #password,
+  button[type=submit].  #error-message added (auth.js showError uses it).
   ===============================================================
 -->
 <!DOCTYPE html>
@@ -16,13 +13,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Smart Expense Tracker</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="./style.css">
 </head>
 
 <body class="auth-body">
 
   <div class="auth-container">
-    <h1>Login</h1>
+    <div class="auth-brand">SMART EXPENSE TRACKER</div>
+    <h1>Welcome back</h1>
+
+    <div id="error-message" style="display:none;"></div>
 
     <form id="login-form">
       <label for="username">Username</label>
@@ -38,7 +43,7 @@
         <a href="./register.html">Register here</a>
       </p>
       <p>
-        <a href="./forgot.html">Forgot Password</a>
+        <a href="./forgot.html">Forgot password?</a>
       </p>
     </form>
   </div>

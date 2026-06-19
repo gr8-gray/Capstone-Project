@@ -1,10 +1,10 @@
 <!--
-  SMART EXPENSE TRACKER – REGISTER PAGE
-  Author: Pukar Adhikari (Frontend Developer / Tester)
-  CMSC 495 – Capstone Project (Nov 2025)
+  SMART EXPENSE TRACKER – REGISTER (Redesign 2026)
+  CMSC 495 – Capstone Project
 
-  Purpose:
-  Redirects users to login.html.
+  JS hooks preserved: #register-form, #first-name, #last-name,
+  #username, #email, #password, #confirm-password, #error-message,
+  button[type="submit"].
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -13,83 +13,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - Smart Expense Tracker</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="style.css" />
   </head>
 
   <body class="auth-body">
     <div class="auth-container">
-      <h1>Create Your Account</h1>
+      <div class="auth-brand">SMART EXPENSE TRACKER</div>
+      <h1>Create your account</h1>
 
-      <!-- Error Message -->
-      <div id="error-message"
-            style="
-              display:none;
-              background:#8465cc;
-              color:white;
-              padding: 8px;
-              border-radius:4px;
-              margin: bottom 10px;
-              font-weight:bold;
-              text-align:center;
-            ">
-      </div>
+      <!-- Error Message (auth.js showError target) -->
+      <div id="error-message" style="display:none;"></div>
 
       <form id="register-form">
 
         <!-- First Name -->
         <label for="first-name">First Name</label>
-        <input 
-          type="text" 
-          id="first-name"
-          placeholder="Enter your first name"
-          required
-        />
+        <input type="text" id="first-name" placeholder="Enter your first name" required />
 
         <!-- Last Name -->
         <label for="last-name">Last Name</label>
-        <input 
-          type="text" 
-            id="last-name"
-            placeholder="Enter your last name"
-            required
-          />
-
+        <input type="text" id="last-name" placeholder="Enter your last name" required />
 
         <!-- Username -->
         <label for="username">Username</label>
-        <input 
-          type="text" 
-          id="username"
-          placeholder="Choose a username"
-          required
-        />
+        <input type="text" id="username" placeholder="Choose a username" required />
 
         <!-- Email -->
         <label for="email">Email</label>
-        <input 
-          type="email"
-          id="email"
-          placeholder="Enter your email"
-          required
-        />
+        <input type="email" id="email" placeholder="Enter your email" required />
 
         <!-- Password -->
         <label for="password">Password</label>
-        <input 
-          type="password"
-          id="password"
-          placeholder="Create a password"
-          required
-        />
+        <input type="password" id="password" placeholder="Create a password" required />
 
         <!-- Confirm Password -->
         <label for="confirm-password">Confirm Password</label>
-        <input 
-          type="password"
-          id="confirm-password"
-          placeholder="Confirm password"
-          required
-        />
+        <input type="password" id="confirm-password" placeholder="Confirm password" required />
 
         <button type="submit" class="btn-primary">Register</button>
 
