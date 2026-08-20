@@ -1,6 +1,6 @@
 # Smart Expense Tracking Application 💰
 
-**Production-Ready | Enterprise-Grade Security | Docker-Powered**
+**JWT Auth | Layered Security | Docker-Powered**
 
 A full-stack web application for personal expense management with JWT authentication, budget monitoring, and comprehensive security features. Developed as a capstone project for CMSC 495 at the University of Maryland Global Campus.
 
@@ -92,7 +92,7 @@ A full-stack web application for personal expense management with JWT authentica
 ✅ **Docker MySQL Migration** - Replaced H2 with production-grade MySQL  
 ✅ **Budget Alert System** - Automated budget monitoring with 4-level alerts  
 ✅ **SQL Injection Prevention** - Custom validators and parameterized queries  
-✅ **Error Handling & Logging** - Enterprise-grade error handling  
+✅ **Error Handling & Logging** - Structured error handling and log rotation  
 ✅ **Category Management** - 8 new CRUD endpoints for categories  
 ✅ **Frontend Integration** - Complete authentication module
 
@@ -235,7 +235,7 @@ Open `frontend/index.html` in your browser
 - ✅ Enable comprehensive expense tracking and categorization
 - ✅ Automate budget monitoring with intelligent alerts
 - ✅ Prevent security vulnerabilities (SQL injection, XSS)
-- ✅ Deliver production-ready code with complete documentation
+- ✅ Deliver well-tested code with complete documentation
 - Support data visualization through charts and summaries
 - Maintain secure user authentication and data protection
 
